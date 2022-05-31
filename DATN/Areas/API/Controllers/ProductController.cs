@@ -45,7 +45,25 @@ namespace DATN.Areas.API.Controllers
                              Star=a.Star,
                              Image=a.Image
                          }).ToArray();
-            return Ok(result);
+
+            var result1 = (from a in _context.Comment
+                           join b in _context.Product on a.ProductId equals b.Id
+                          where b.Id == id
+                          select new
+                          {
+                               User= (from c in _context.Comment
+                                      join d in _context.AppUsers on c.AppUserId equals d.Id
+                                      where c.ProductId==id
+                                      select d.UserName),
+                               Content= a.Content,
+                               Star=a.Star
+                          }).ToArray();
+            return Ok(new
+            {
+                result,
+                result1,
+
+            });
         }
 
         [HttpGet]
@@ -59,7 +77,11 @@ namespace DATN.Areas.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] Product product)
         {
-
+            var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
+            if(pro!=null)
+            {
+                return BadRequest("Sản phẩm đã tồn tại");
+            }
             if (ModelState.IsValid)
             {
 

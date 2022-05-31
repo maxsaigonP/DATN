@@ -42,7 +42,7 @@ namespace DATN.Models
         public TradeMark? TradeMark { get; set; }
 
         [DisplayName("Đánh giá")]
-        public float Star { get; set; }
+        public double Star { get; set; }
 
         
         [DisplayName("Hình ảnh")]

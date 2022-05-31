@@ -59,6 +59,9 @@ namespace DATN.Controllers
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo,
+                    id=user.Id,
+                    address=user.ShippingAddress
+                    
                 });
             }
             return Unauthorized();
