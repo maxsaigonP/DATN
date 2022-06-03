@@ -37,7 +37,9 @@ namespace DATN.Areas.API.Controllers
             cmt.Star = star;
             cmt.Time = DateTime.Now;
             cmt.Status = true;
+            cmt.ProductId = productID;
             _context.Comment.Add(cmt);
+            await _context.SaveChangesAsync();
 
 
             var rate = await _context.Comment.Where(c => c.ProductId == productID).ToListAsync();

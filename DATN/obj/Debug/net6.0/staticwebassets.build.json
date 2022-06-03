@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "RzPeCHvNK1O9irHF7o7XazcqPoeZR4AfVMubi21Wzyk=",
+  "Hash": "euQjewNZ6H1F/zfdy8XvfRLCBOPlysJ7Ta1tOSzdvbk=",
   "Source": "DATN",
   "BasePath": "_content/DATN",
   "Mode": "Default",
@@ -15,91 +15,5 @@
       "Pattern": "**"
     }
   ],
-  "Assets": [
-    {
-      "Identity": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\images\\product\\2.docx",
-      "SourceId": "DATN",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\",
-      "BasePath": "_content/DATN",
-      "RelativePath": "images/product/2.docx",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\product\\2.docx"
-    },
-    {
-      "Identity": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\images\\product\\3.jpg",
-      "SourceId": "DATN",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\",
-      "BasePath": "_content/DATN",
-      "RelativePath": "images/product/3.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\product\\3.jpg"
-    },
-    {
-      "Identity": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\images\\product\\4.jpg",
-      "SourceId": "DATN",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\",
-      "BasePath": "_content/DATN",
-      "RelativePath": "images/product/4.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\product\\4.jpg"
-    },
-    {
-      "Identity": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\images\\product\\5.jpg",
-      "SourceId": "DATN",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\",
-      "BasePath": "_content/DATN",
-      "RelativePath": "images/product/5.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\product\\5.jpg"
-    },
-    {
-      "Identity": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\images\\product\\7.jpg",
-      "SourceId": "DATN",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\DA_TotNghiep\\DATN\\DATN\\wwwroot\\",
-      "BasePath": "_content/DATN",
-      "RelativePath": "images/product/7.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\product\\7.jpg"
-    }
-  ]
+  "Assets": []
 }

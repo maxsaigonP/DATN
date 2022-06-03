@@ -27,7 +27,7 @@ namespace DATN.Areas.API.Controllers
             if (ModelState.IsValid)
             {
                 var cate = await _context.Category.Where(p => p.Name == category.Name).ToListAsync();
-                if (cate != null)
+                if (cate.Count!=0)
                 {
                     return BadRequest("Loại sản phẩm đã tồn tại");
                 }

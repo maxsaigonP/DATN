@@ -37,7 +37,7 @@ namespace DATN.Controllers
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
+             
                 };
 
                 foreach (var userRole in userRoles)
@@ -60,7 +60,8 @@ namespace DATN.Controllers
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo,
                     id=user.Id,
-                    address=user.ShippingAddress
+                    address=user.ShippingAddress,
+                    phone=user.PhoneNumber,
                     
                 });
             }
