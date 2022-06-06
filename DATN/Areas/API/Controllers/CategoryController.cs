@@ -1,11 +1,14 @@
 ﻿using DATN.Data;
 using DATN.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DATN.Areas.API.Controllers
 {
     [Route("api/[controller]/[action]")]
+   // [Authorize("Admin")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -23,12 +26,21 @@ namespace DATN.Areas.API.Controllers
         {
             if (ModelState.IsValid)
             {
-       
+                var cate = await _context.Category.Where(p => p.Name == category.Name).ToListAsync();
+                if (cate.Count!=0)
+                {
+                    return BadRequest("Loại sản phẩm đã tồn tại");
+                }
+
                 _context.Add(category);
 
                 await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    ok = "abc"
+                });
             }
-            return Ok("Ok");
+            return BadRequest(ModelState);
         }
 
         [HttpPost]
@@ -56,5 +68,7 @@ namespace DATN.Areas.API.Controllers
             }
             return Ok(category.Name);
         }
+
+    
     }
 }

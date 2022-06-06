@@ -22,6 +22,8 @@ namespace DATN.Data
         public DbSet<DATN.Models.Log>? Log { get; set; }
         public DbSet<DATN.Models.TradeMark>? TradeMarks { get; set; }
 
+        public DbSet<DATN.Models.AppUser>? AppUsers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

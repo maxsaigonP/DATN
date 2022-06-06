@@ -30,22 +30,39 @@ namespace DATN.Areas.API.Controllers
         [HttpGet]
         public async Task<ActionResult> Detail(int id)
         {
-            var pro = await _context.Product.FindAsync(id);
+            var pro =  _context.Product.Find(id);
 
             var result= (from a in _context.Product
                          where a.Id==id
                          select new
                          {
                              Name=a.Name,
-                             Category=a.Category,
+                             Category=a.Category.Name,
                              Price= a.Price,
                              Description=a.Description,
                              Stock=a.Quantily,
-                             TradeMark=a.TradeMark,
+                             TradeMark=a.TradeMark.Name,
                              Star=a.Star,
                              Image=a.Image
                          }).ToArray();
-            return Ok(result);
+
+            //var result1 = (from a in _context.Comment
+            //               join b in _context.Product on a.ProductId equals b.Id
+            //              where b.Id == id
+            //              select new
+            //              {
+            //                   User= (from c in _context.Comment
+            //                          join d in _context.AppUsers on c.AppUserId equals d.Id
+            //                          where c.ProductId==id
+            //                          select d.UserName),
+            //                   Content= a.Content,
+            //                   Star=a.Star
+            //              }).ToArray();
+            return Ok(
+            
+                result
+
+            );
         }
 
         [HttpGet]
@@ -59,7 +76,11 @@ namespace DATN.Areas.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] Product product)
         {
-
+            var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
+            if(pro.Count!=0)
+            {
+                return BadRequest("Sản phẩm đã tồn tại");
+            }
             if (ModelState.IsValid)
             {
 

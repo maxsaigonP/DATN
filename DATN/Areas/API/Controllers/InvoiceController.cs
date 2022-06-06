@@ -21,23 +21,30 @@ namespace DATN.Areas.API.Controllers
 
         [HttpPost]
          
-        public async Task<IActionResult> Create(string id,string Address,string Phone,float Total)
+        public async Task<IActionResult> Create(string id,string Address,string Phone)
         {
-            var iv = new Invoice();
-            iv.AppUserId = id;
-            iv.IssuedDate = DateTime.Now;
-            iv.ShippingAddress = Address;
-            iv.ShippingPhone = Phone;
-            iv.Total = Total;
-            _context.Add(iv);
+            
 
             var cart =  _context.Cart.Where(c => c.AppUserId == id).ToList();
+            var total = 0;
+
             if (cart != null)
             {
-
+                foreach(var c in cart)
+                {
+                    total = total + (UnitPrice(c.ProductId) * c.Quantity);
+                }
+                var iv = new Invoice();
+                iv.AppUserId = id;
+                iv.IssuedDate = DateTime.Now;
+                iv.ShippingAddress = Address;
+                iv.ShippingPhone = Phone;
+                iv.Total = total;
+                _context.Add(iv);
 
                 foreach (var c in cart)
                 {
+                
                     var ivd = new InvoiceDetail();
                     ivd.InvoiceId = iv.Id;
                     ivd.ProductId = c.ProductId;
@@ -47,6 +54,8 @@ namespace DATN.Areas.API.Controllers
                     _context.Add(ivd);
                     await _context.SaveChangesAsync();
                 }
+                _context.Remove(cart);
+                await _context.SaveChangesAsync();
         
                 return Ok("Dat hang thanh cong");
             }
