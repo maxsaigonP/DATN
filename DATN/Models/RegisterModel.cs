@@ -16,5 +16,8 @@ namespace DATN.Models
 
         [Required(ErrorMessage = "Phone number is required")]
         public string Phone { get; set; }
+
+      
+        public string? Avatar { get; set; }
     }
 }

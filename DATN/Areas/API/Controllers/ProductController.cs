@@ -12,6 +12,7 @@ namespace DATN.Areas.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        public string Url = "C:\\Users\\BAO PHUC- PC\\DATN\\src\\assets\\img\\product";
 
         public ProductController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -21,10 +22,21 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Product>> Show()
+        public async Task<ActionResult> Show()
         {
-            var pro = await _context.Product.ToListAsync();
-            return pro;
+            var result = (from a in _context.Product
+                          select new
+                          {
+                              Name = a.Name,
+                              Category = a.Category.Name,
+                              Price = a.Price,
+                              Description = a.Description,
+                              Stock = a.Quantily,
+                              TradeMark = a.TradeMark,
+                              Star = a.Star,
+                              Image = a.Image
+                          }).ToArray();
+            return Ok(result);
         }
 
         [HttpGet]
@@ -41,7 +53,7 @@ namespace DATN.Areas.API.Controllers
                              Price= a.Price,
                              Description=a.Description,
                              Stock=a.Quantily,
-                             TradeMark=a.TradeMark.Name,
+                             TradeMark=a.TradeMark,
                              Star=a.Star,
                              Image=a.Image
                          }).ToArray();
@@ -76,7 +88,9 @@ namespace DATN.Areas.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] Product product)
         {
+           
             var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
+            var trade= await _context.TradeMarks.Where(t=>t.Name.ToUpper().Equals(product.TradeMark.ToUpper())).ToListAsync();
             if(pro.Count!=0)
             {
                 return BadRequest("Sản phẩm đã tồn tại");
@@ -89,7 +103,7 @@ namespace DATN.Areas.API.Controllers
                 if (product.ImageFile != null)
                 {
                     var fileName = product.Id.ToString() + Path.GetExtension(product.ImageFile.FileName);
-                    var uploadPath = Path.Combine("C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\Hmart - Electronics eCommerce HTML Template\\hmart\\assets\\images\\product-image");
+                    var uploadPath = Path.Combine(Url);
                     var filePath = Path.Combine(uploadPath, fileName);
                     using (FileStream fs = System.IO.File.Create(filePath))
                     {
@@ -98,6 +112,12 @@ namespace DATN.Areas.API.Controllers
                     }
                     product.Image = fileName;
                     product.Star = 5;
+                    if (trade.Count == 0)
+                    {
+                        var tr = new TradeMark();
+                        tr.Name = product.TradeMark.ToUpper();
+                        _context.TradeMarks.Add(tr);
+                    }
                     _context.Update(product);
                     await _context.SaveChangesAsync();
 
@@ -108,10 +128,10 @@ namespace DATN.Areas.API.Controllers
                     _context.Add(img);
                     await _context.SaveChangesAsync();
                 }
-                return RedirectToAction(nameof(Index));
+                return Ok("Sucess");
             }
            
-            return Ok();
+            return BadRequest("Fail");
         }
 
         [HttpPost]
@@ -130,14 +150,14 @@ namespace DATN.Areas.API.Controllers
                     _context.Update(product);
                     if (product.ImageFile != null)
                     {
-                        var fileDelete = Path.Combine("C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\Hmart - Electronics eCommerce HTML Template\\hmart\\assets\\images\\product-image", product.Image);
+                        var fileDelete = Path.Combine(Url, product.Image);
                         FileInfo file = new FileInfo(fileDelete);
                         file.Delete();
                     }
                     if (product.ImageFile != null)
                     {
                         var fileName = product.Id.ToString() + Path.GetExtension(product.ImageFile.FileName);
-                        var uploadPath = Path.Combine("C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\Hmart - Electronics eCommerce HTML Template\\hmart\\assets\\images\\product-image");
+                        var uploadPath = Path.Combine(Url);
                         var filePath = Path.Combine(uploadPath, fileName);
                         using (FileStream fs = System.IO.File.Create(filePath))
                         {

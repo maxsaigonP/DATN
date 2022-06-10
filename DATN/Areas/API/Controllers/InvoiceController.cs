@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.Areas.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class InvoiceController : ControllerBase
     {
@@ -18,6 +18,39 @@ namespace DATN.Areas.API.Controllers
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
+        [HttpGet]
+         public async Task<IActionResult> GetInvoice()
+        {
+            var result = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          select new
+                          {
+                              Id=a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total
+                          }).ToArray();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetInvoiceDetail(int id)
+        {
+            var result = (from a in _context.invoiceDetail
+                          join b in _context.Product on a.ProductId equals b.Id
+                          where a.InvoiceId == id
+                          select new
+                          {
+                              SanPham = b.Name,
+                              Soluong = a.Quantity,
+                              DonGia = a.UnitPrice
+                          }).ToList();
+
+            return Ok(result);
+        }
 
         [HttpPost]
          
@@ -25,7 +58,7 @@ namespace DATN.Areas.API.Controllers
         {
             
 
-            var cart =  _context.Cart.Where(c => c.AppUserId == id).ToList();
+            var cart =  _context.Cart.Where(c => c.AppUserId == id&&c.Status==false).ToList();
             var total = 0;
 
             if (cart != null)
@@ -36,11 +69,13 @@ namespace DATN.Areas.API.Controllers
                 }
                 var iv = new Invoice();
                 iv.AppUserId = id;
-                iv.IssuedDate = DateTime.Now;
+                iv.IssuedDate = DateTime.Now.Date;
                 iv.ShippingAddress = Address;
                 iv.ShippingPhone = Phone;
                 iv.Total = total;
+                iv.Status = false;
                 _context.Add(iv);
+                await _context.SaveChangesAsync();
 
                 foreach (var c in cart)
                 {
@@ -52,6 +87,8 @@ namespace DATN.Areas.API.Controllers
                     ivd.UnitPrice = UnitPrice(c.ProductId) * c.Quantity;
                     ivd.Status = true;
                     _context.Add(ivd);
+                
+                    _context.Cart.Remove(c);
                     await _context.SaveChangesAsync();
                 }
                 _context.Remove(cart);
@@ -62,6 +99,7 @@ namespace DATN.Areas.API.Controllers
             return NoContent();
         }
 
+        [HttpGet]
         public int UnitPrice(int id)
         {
             var pr = _context.Product.Find(id);

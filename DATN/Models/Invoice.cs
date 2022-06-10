@@ -15,7 +15,7 @@ namespace DATN.Models
 
         public AppUser AppUser { get; set; }
         [DisplayName("Ngày lập hoá đơn")]
-
+        [DataType(DataType.Date)]
         public DateTime? IssuedDate { get; set; }
         [DisplayName("Địa chỉ giao hàng")]
         public string ShippingAddress { get; set; }

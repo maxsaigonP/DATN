@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace DATN.Models
         public string AppUserId { get; set; }
         public AppUser AppUser { get; set; }
         [DisplayName("Thời gian")]
+        [DataType(DataType.Date)]
         public DateTime Time { get; set; }
         [DisplayName("Sản phẩm")]
         public int ProductId { get; set; }
