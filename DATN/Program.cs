@@ -15,10 +15,14 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         builder =>
         {
-            builder.WithOrigins("http://127.0.0.1:5500",
-                                "https://localhost:7043")
+            builder.WithOrigins("http://localhost:4200",
+                                "https://localhost:7043",
+                                "http://127.0.0.1:5500")
+           
+
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
         });
 });
 builder.Services.AddControllers();

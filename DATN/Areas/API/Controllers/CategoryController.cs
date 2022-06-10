@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DATN.Areas.API.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]/[action]")]
-   // [Authorize("Admin")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -21,8 +21,29 @@ namespace DATN.Areas.API.Controllers
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
+
+
+
+
+        [HttpGet]
+
+        public async Task<ActionResult> GetCategory()
+        {
+            var cate = await _context.Category.ToListAsync();
+       
+            var result= (from a in _context.Category
+                         select new
+                         {
+                             Name=a.Name,
+                             TotalProduct=(from b in _context.Product
+                                           where b.CategoryId==a.Id
+                                           select b).Count()
+                         }).ToList();
+            return Ok(result);
+        }
+
         [HttpPost]  
-        public async Task<IActionResult> Create([FromForm] Category category)
+        public async Task<IActionResult> PostCategory([FromBody] Category category)
         {
             if (ModelState.IsValid)
             {
@@ -31,14 +52,13 @@ namespace DATN.Areas.API.Controllers
                 {
                     return BadRequest("Loại sản phẩm đã tồn tại");
                 }
-
+              
+                category.Status = true;
                 _context.Add(category);
 
                 await _context.SaveChangesAsync();
-                return Ok(new
-                {
-                    ok = "abc"
-                });
+                return Ok("Ok"
+                );
             }
             return BadRequest(ModelState);
         }

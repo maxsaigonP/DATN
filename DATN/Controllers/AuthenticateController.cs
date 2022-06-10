@@ -1,4 +1,5 @@
-﻿using DATN.Models;
+﻿using DATN.Data;
+using DATN.Models;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +18,42 @@ namespace DATN.Controllers
         private readonly UserManager<AppUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context;
 
-        public AuthenticateController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+
+        public AuthenticateController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ApplicationDbContext context)
         {
+            _context = context;
             this.userManager = userManager;
             this.roleManager = roleManager;
             _configuration = configuration;
+            
         }
+
+        [HttpGet]
+        [Route("getAccount")]
+
+        public async Task<IActionResult> GetAllAccount()
+        {
+           
+            var result=(from a in _context.AppUsers
+                        select new
+                        {
+                            Avatar=a.Avatar,
+                            Username=a.UserName,
+                            Email=a.Email,
+                            Phone=a.PhoneNumber,
+                            Address=a.ShippingAddress,
+                            AccoutType=a.AccoutType,
+                        }).ToList();
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
+            var role = "";
             var user = await userManager.FindByNameAsync(model.Username);
             if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
             {
@@ -40,9 +66,16 @@ namespace DATN.Controllers
              
                 };
 
-                foreach (var userRole in userRoles)
+                if (userRoles.Count >0)
                 {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    foreach (var userRole in userRoles)
+                    {
+                        authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    }
+                    role = userRoles[0];
+                }else
+                {
+                    role = "";
                 }
 
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
@@ -52,6 +85,7 @@ namespace DATN.Controllers
                     audience: _configuration["JWT:ValidAudience"],
                     expires: DateTime.Now.AddHours(3),
                     claims: authClaims,
+                    
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
 
@@ -62,6 +96,8 @@ namespace DATN.Controllers
                     id=user.Id,
                     address=user.ShippingAddress,
                     phone=user.PhoneNumber,
+                    role=role
+
                     
                 });
             }
@@ -81,7 +117,9 @@ namespace DATN.Controllers
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-                PhoneNumber=model.Phone
+                PhoneNumber=model.Phone,
+                Avatar=model.Avatar,
+                AccoutType="User"
             };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -102,7 +140,8 @@ namespace DATN.Controllers
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
+                UserName = model.Username,
+                AccoutType = "Admin"
             };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)

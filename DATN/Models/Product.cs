@@ -36,13 +36,11 @@ namespace DATN.Models
         public Category? Category { get; set; }
 
         [DisplayName("Thương hiệu")]
-        public int TradeMarkId { get; set; }
+        public string TradeMark { get; set; }
 
-        [DisplayName("Thương hiệu")]
-        public TradeMark? TradeMark { get; set; }
 
         [DisplayName("Đánh giá")]
-        public double Star { get; set; }
+        public double? Star { get; set; }
 
         
         [DisplayName("Hình ảnh")]
