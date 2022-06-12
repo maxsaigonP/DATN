@@ -46,7 +46,7 @@ namespace DATN.Areas.API.Controllers
             var avgStar = rate.Average(c => c.Star);
 
             var pro = await _context.Product.FindAsync(productID);
-            pro.Star = avgStar;
+            pro.Star =Math.Round(avgStar,1);
             _context.Product.Update(pro);
             await _context.SaveChangesAsync();
 

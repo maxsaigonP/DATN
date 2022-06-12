@@ -20,12 +20,35 @@ namespace DATN.Areas.API.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetCart(string userid)
+        {
+            var result = (from a in _context.Cart
+                          join b in _context.Product on a.ProductId equals b.Id
+                          where a.AppUserId == userid
+                          select new
+                          {
+                              Id=a.Id,
+                              Image=b.Image,
+                              TenSanPham = b.Name,
+                              IdSanPham = a.ProductId,
+                              SoLuong = a.Quantity,
+                              GiaSanPham=b.Price,
+                              Gia = b.Price * a.Quantity,
+                              SoLuongCart= (from c in _context.Cart
+                                            where c.AppUserId == userid
+                                            select c).Count()
+                          }).ToList();
+
+            return Ok(result);
+        }
+
 
         [HttpPost]
 
         public async Task<IActionResult> AddCart(int sanPham,int soLuong,string userID)
         {
-            var check = await _context.Cart.Where(c => c.ProductId == sanPham).FirstOrDefaultAsync();
+            var check = await _context.Cart.Where(c => c.ProductId == sanPham&&c.AppUserId==userID).FirstOrDefaultAsync();
             if (check != null)
             {
                 check.Quantity += soLuong;
@@ -43,7 +66,10 @@ namespace DATN.Areas.API.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Ok("Da them vao gio hang");
+            return Ok(new
+            {
+                status=200
+            });
         }
 
 

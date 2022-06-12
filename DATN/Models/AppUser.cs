@@ -9,5 +9,8 @@ namespace DATN.Models
         public string? ShippingAddress { get; set; }
         public List<Comment>? Comments { get; set; }
         public List<Cart>? Carts { get; set; }
+        public List<WishList>? WishLists { get; set; }
+
+        public bool? IsLocked { get; set; }
     }
 }

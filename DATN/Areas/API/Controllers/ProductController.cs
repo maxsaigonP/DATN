@@ -20,6 +20,12 @@ namespace DATN.Areas.API.Controllers
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
+        [HttpGet]
+        public async Task<ActionResult> Show1()
+        {
+            var result = await _context.Product.ToListAsync();
+            return Ok(result);
+        }
 
         [HttpGet]
         public async Task<ActionResult> Show()
@@ -27,6 +33,7 @@ namespace DATN.Areas.API.Controllers
             var result = (from a in _context.Product
                           select new
                           {
+                              Id=a.Id,
                               Name = a.Name,
                               Category = a.Category.Name,
                               Price = a.Price,
@@ -42,7 +49,7 @@ namespace DATN.Areas.API.Controllers
         [HttpGet]
         public async Task<ActionResult> Detail(int id)
         {
-            var pro =  _context.Product.Find(id);
+           
 
             var result= (from a in _context.Product
                          where a.Id==id
@@ -56,23 +63,27 @@ namespace DATN.Areas.API.Controllers
                              TradeMark=a.TradeMark,
                              Star=a.Star,
                              Image=a.Image
-                         }).ToArray();
+                         }).FirstOrDefault();
 
-            //var result1 = (from a in _context.Comment
-            //               join b in _context.Product on a.ProductId equals b.Id
-            //              where b.Id == id
-            //              select new
-            //              {
-            //                   User= (from c in _context.Comment
-            //                          join d in _context.AppUsers on c.AppUserId equals d.Id
-            //                          where c.ProductId==id
-            //                          select d.UserName),
-            //                   Content= a.Content,
-            //                   Star=a.Star
-            //              }).ToArray();
+         
             return Ok(
             
                 result
+
+            );
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Detail1(int id)
+        {
+            var pro = _context.Product.Find(id);
+
+          
+
+
+            return Ok(
+
+                pro
 
             );
         }
@@ -85,8 +96,9 @@ namespace DATN.Areas.API.Controllers
             return pro;
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] Product product)
+        public async Task<IActionResult> PostProduct([FromForm] Product product)
         {
            
             var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
@@ -102,7 +114,8 @@ namespace DATN.Areas.API.Controllers
                 await _context.SaveChangesAsync();
                 if (product.ImageFile != null)
                 {
-                    var fileName = product.Id.ToString() + Path.GetExtension(product.ImageFile.FileName);
+                    
+                     var fileName = product.Id.ToString() + Path.GetExtension(product.ImageFile.FileName);
                     var uploadPath = Path.Combine(Url);
                     var filePath = Path.Combine(uploadPath, fileName);
                     using (FileStream fs = System.IO.File.Create(filePath))
@@ -128,10 +141,10 @@ namespace DATN.Areas.API.Controllers
                     _context.Add(img);
                     await _context.SaveChangesAsync();
                 }
-                return Ok("Sucess");
+                return Ok();
             }
-           
-            return BadRequest("Fail");
+
+            return Ok();
         }
 
         [HttpPost]
@@ -195,5 +208,8 @@ namespace DATN.Areas.API.Controllers
             await _context.SaveChangesAsync();
             return Ok("Delete success");
         }
+
+
+       
     }
 }

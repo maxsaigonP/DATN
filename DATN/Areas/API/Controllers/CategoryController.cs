@@ -23,7 +23,15 @@ namespace DATN.Areas.API.Controllers
         }
 
 
+        [HttpGet]
 
+        public async Task<ActionResult> GetCategoryById(int id)
+        {
+            var cate = await _context.Category.FindAsync(id);
+
+          
+            return Ok(cate);
+        }
 
         [HttpGet]
 
@@ -34,6 +42,7 @@ namespace DATN.Areas.API.Controllers
             var result= (from a in _context.Category
                          select new
                          {
+                             Id=a.Id,
                              Name=a.Name,
                              TotalProduct=(from b in _context.Product
                                            where b.CategoryId==a.Id
@@ -64,29 +73,48 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update([FromForm] Category category,int id)
+        public async Task<IActionResult> Update(string name,int id,bool? status)
         {
-            if (ModelState.IsValid&&id==category.Id)
+            try
             {
-                var cate = await _context.Category.FindAsync(id);
 
+         
+                var cate = await _context.Category.FindAsync(id);
+                cate.Name=name;
+                cate.Status = status;
                 _context.Update(cate);
 
                 await _context.SaveChangesAsync();
+                return Ok("Ok");
             }
-            return Ok("Ok");
+            catch(Exception e)
+            {
+                return BadRequest();
+            }
+
+
+           
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _context.Category.FindAsync(id);
-            if(category!=null)
+            var pro = await _context.Product.Where(p => p.CategoryId == id).ToListAsync();
+            if(pro.Count>0)
             {
-                _context.Remove(category);
-                await _context.SaveChangesAsync();
+                return BadRequest("Không thể xoá");
+            }else
+            {
+                var category = await _context.Category.FindAsync(id);
+                if (category != null)
+                {
+                    _context.Remove(category);
+                    await _context.SaveChangesAsync();
+                }
+                return Ok(category.Name);
             }
-            return Ok(category.Name);
+
+            return BadRequest();
         }
 
     

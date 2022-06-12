@@ -53,7 +53,7 @@ namespace DATN.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var role = "";
+          
             var user = await userManager.FindByNameAsync(model.Username);
             if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
             {
@@ -72,10 +72,10 @@ namespace DATN.Controllers
                     {
                         authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                     }
-                    role = userRoles[0];
+               
                 }else
                 {
-                    role = "";
+                 
                 }
 
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
@@ -96,9 +96,12 @@ namespace DATN.Controllers
                     id=user.Id,
                     address=user.ShippingAddress,
                     phone=user.PhoneNumber,
-                    role=role
+                    role=user.AccoutType,
+                    username=user.UserName,
 
-                    
+
+
+
                 });
             }
             return Unauthorized();
@@ -120,6 +123,7 @@ namespace DATN.Controllers
                 PhoneNumber=model.Phone,
                 Avatar=model.Avatar,
                 AccoutType="User"
+               
             };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -141,7 +145,7 @@ namespace DATN.Controllers
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-                AccoutType = "Admin"
+                AccoutType ="Admin"
             };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)

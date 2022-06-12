@@ -37,6 +37,44 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetInvoiceConfirm()
+        {
+            var result = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.Status == false
+                          select new
+                          {
+                              Id = a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total
+                          }).ToArray();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Invoice1(int id)
+        {
+            var result = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.Id == id
+                          select new
+                          {
+                              Id = a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total
+                          }).FirstOrDefault();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetInvoiceDetail(int id)
         {
             var result = (from a in _context.invoiceDetail
@@ -108,7 +146,7 @@ namespace DATN.Areas.API.Controllers
 
         [HttpPost]
 
-        public async Task<IActionResult> DuyetDon([FromForm] Invoice invoice, int id)
+        public async Task<IActionResult> DuyetDon(int id)
         {
             var iv= await _context.Invoice.FindAsync(id);
             if (ModelState.IsValid&&iv!=null)
