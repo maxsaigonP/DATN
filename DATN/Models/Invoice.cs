@@ -30,8 +30,8 @@ namespace DATN.Models
 
         public bool? Status { get; set; }
 
-        [DisplayName("Huỷ đơn")]
-        public bool? Cancle { get; set; }
+        [DisplayName("Hoàn thành")]
+        public bool? Complete { get; set; }
 
         public List<InvoiceDetail>? InvoiceDetails { get; set; }
     }

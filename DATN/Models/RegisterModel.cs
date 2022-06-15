@@ -4,6 +4,8 @@ namespace DATN.Models
 {
     public class RegisterModel
     {
+
+        public string FullName{ get; set; }
         [Required(ErrorMessage = "User Name is required")]
         public string Username { get; set; }
 
@@ -16,8 +18,9 @@ namespace DATN.Models
 
         [Required(ErrorMessage = "Phone number is required")]
         public string Phone { get; set; }
+        [Required(ErrorMessage = "Location is required")]
+        public string? ShippingAddress{ get; set; }
 
-      
         public string? Avatar { get; set; }
     }
 }

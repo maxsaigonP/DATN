@@ -1764,6 +1764,19 @@
           }
         }
       },
+      "NBitcoin/7.0.8": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "compile": {
+          "lib/net6.0/NBitcoin.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/NBitcoin.dll": {}
+        }
+      },
       "NETStandard.Library/1.6.1": {
         "type": "package",
         "dependencies": {
@@ -6111,6 +6124,30 @@
         "version.txt"
       ]
     },
+    "NBitcoin/7.0.8": {
+      "sha512": "kp4PASO3jNofdNKbiNFr9ctddahUQ27e6FN4e1eICAwjuMUQ11uF6kwyNxgmfZxOCbgMi8Q6KkQKi6fYItfFMg==",
+      "type": "package",
+      "path": "nbitcoin/7.0.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net472/NBitcoin.dll",
+        "lib/net472/NBitcoin.xml",
+        "lib/net6.0/NBitcoin.dll",
+        "lib/net6.0/NBitcoin.xml",
+        "lib/netstandard1.1/NBitcoin.dll",
+        "lib/netstandard1.1/NBitcoin.xml",
+        "lib/netstandard1.3/NBitcoin.dll",
+        "lib/netstandard1.3/NBitcoin.xml",
+        "lib/netstandard2.0/NBitcoin.dll",
+        "lib/netstandard2.0/NBitcoin.xml",
+        "lib/netstandard2.1/NBitcoin.dll",
+        "lib/netstandard2.1/NBitcoin.xml",
+        "nbitcoin.7.0.8.nupkg.sha512",
+        "nbitcoin.nuspec"
+      ]
+    },
     "NETStandard.Library/1.6.1": {
       "sha512": "WcSp3+vP+yHNgS8EV5J7pZ9IRpeDuARBPN28by8zqff1wJQXm26PVU8L3/fYLBJVU7BtDyqNVWq2KlCVvSSR4A==",
       "type": "package",
@@ -10431,6 +10468,7 @@
       "Microsoft.EntityFrameworkCore.SqlServer >= 6.0.5",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.5",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 6.0.5",
+      "NBitcoin >= 7.0.8",
       "Swashbuckle.AspNetCore >= 6.3.0"
     ]
   },
@@ -10498,6 +10536,10 @@
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
             "target": "Package",
             "version": "[6.0.5, )"
+          },
+          "NBitcoin": {
+            "target": "Package",
+            "version": "[7.0.8, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",

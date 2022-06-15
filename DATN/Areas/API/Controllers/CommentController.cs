@@ -21,16 +21,68 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Comment>> Show()
+        public async Task<IActionResult> GetAllComment()
         {
-            var pro = await _context.Comment.ToListAsync();
-            return pro;
+            var result= (from a in _context.Comment
+                         join b in _context.Product on a.ProductId equals b.Id
+                         select new
+                         {
+                             Id=a.Id,
+                             UserId=a.AppUserId,
+                             NoiDung=a.Content,
+                             IdSanPham=a.ProductId,
+                             TenSanPham=b.Name,
+                             DanhGia=a.Star,
+                             ThoiGian=a.Time
+                         }).ToList();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCommentInProduct(int id)
+        {
+            var result = (from a in _context.Comment
+                          join b in _context.Product on a.ProductId equals b.Id
+                          join c in _context.AppUsers on a.AppUserId equals c.Id
+                          where a.ProductId == id
+                          select new
+                          {
+                              Id = a.Id,
+                              UserId=a.AppUserId,
+                              NoiDung = a.Content,
+                              IdSanPham = a.ProductId,
+                              TenSanPham = b.Name,
+                              DanhGia = a.Star,
+                              ThoiGian = a.Time,
+                              TenNguoiDung=c.FullName,
+                              Avatar=c.Avatar,
+                              RepId=a.ReplyId
+                          }).ToList();
+            return Ok(result);
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> AddComment(string userID, string content, int star, int productID)
+        public async Task<IActionResult> AddComment(string userID, string content, int star, int productID,int replyID)
         {
+            var comment = await _context.Comment.Where(c => c.AppUserId == userID && c.ProductId == productID&&c.ReplyId==0).FirstOrDefaultAsync();
+
+            
+            if(comment!=null)
+            {
+                _context.Comment.Remove(comment);
+                _context.SaveChanges();
+                var rate1 =  _context.Comment.Where(c => c.ProductId == productID&&c.ReplyId==0).ToList();
+                var avgStar1 = rate1.Average(c => c.Star);
+
+                var pro1 = _context.Product.Find(productID);
+                pro1.Star = Math.Round(avgStar1, 1);
+                _context.Product.Update(pro1);
+                _context.SaveChanges();
+     
+
+            }
+
             var cmt = new Comment();
             cmt.AppUserId = userID;
             cmt.Content = content;
@@ -38,11 +90,12 @@ namespace DATN.Areas.API.Controllers
             cmt.Time = DateTime.Now;
             cmt.Status = true;
             cmt.ProductId = productID;
+            cmt.ReplyId = replyID;
             _context.Comment.Add(cmt);
             await _context.SaveChangesAsync();
 
 
-            var rate = await _context.Comment.Where(c => c.ProductId == productID).ToListAsync();
+            var rate = await _context.Comment.Where(c => c.ProductId == productID&&c.ReplyId==0).ToListAsync();
             var avgStar = rate.Average(c => c.Star);
 
             var pro = await _context.Product.FindAsync(productID);
@@ -50,7 +103,11 @@ namespace DATN.Areas.API.Controllers
             _context.Product.Update(pro);
             await _context.SaveChangesAsync();
 
-            return Ok("Đã gửi bình luận");
+            return Ok(new
+            {
+                status=200,
+                msg="Đã gửi bình luận"
+            });
         }
 
         [HttpPost]
@@ -61,6 +118,15 @@ namespace DATN.Areas.API.Controllers
             
             if(cmt!=null)
             {
+                var subCmt = await _context.Comment.Where(c => c.ReplyId == commentID && c.ProductId == cmt.ProductId).ToListAsync();
+                if (subCmt.Count>0)
+                {
+                    foreach(var c in subCmt)
+                    {
+                        _context.Comment.Remove(c);
+                        _context.SaveChanges();
+                    }
+                }
                
                 _context.Comment.Remove(cmt);
                 await _context.SaveChangesAsync();

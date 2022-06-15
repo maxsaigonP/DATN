@@ -68,7 +68,8 @@ namespace DATN.Areas.API.Controllers
 
             return Ok(new
             {
-                status=200
+                status=200,
+                msg="Đã thêm vào giỏ hàng"
             });
         }
 
@@ -115,7 +116,11 @@ namespace DATN.Areas.API.Controllers
 
             if (cart != null)
             {
-              _context.Remove(cart);
+                foreach(var c in cart)
+                {
+                    _context.Remove(c);
+                }
+              
                 await  _context.SaveChangesAsync();
                 return Ok("Da xoa toan bo gio hang");
             }
@@ -124,5 +129,9 @@ namespace DATN.Areas.API.Controllers
 
             return BadRequest();
         }
+
+
+
+       
     }
 }

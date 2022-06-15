@@ -39,14 +39,106 @@ namespace DATN.Controllers
             var result=(from a in _context.AppUsers
                         select new
                         {
+                            Id=a.Id,
                             Avatar=a.Avatar,
                             Username=a.UserName,
                             Email=a.Email,
                             Phone=a.PhoneNumber,
                             Address=a.ShippingAddress,
                             AccoutType=a.AccoutType,
+                            IsLocked=a.IsLocked,
                         }).ToList();
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("getAccountById")]
+
+        public async Task<IActionResult> GetAccount(string id)
+        {
+
+            var result = (from a in _context.AppUsers
+                          where a.Id== id
+                          select new
+                          {
+                              Id = a.Id,
+                              FullName=a.FullName,
+                              Avatar = a.Avatar,
+                              Username = a.UserName,
+                              Email = a.Email,
+                              Phone = a.PhoneNumber,
+                              Address = a.ShippingAddress,
+                              AccoutType = a.AccoutType,
+                              IsLocked = a.IsLocked,
+                              Password=a.PasswordHash
+                          }).FirstOrDefault();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("lockAccount")]
+
+        public async Task<IActionResult> LockAccount(string id)
+        {
+
+            var acc=await _context.AppUsers.FindAsync(id);
+
+            if(acc!=null)
+            {
+                if(acc.IsLocked==true)
+                {
+                    acc.IsLocked = false;
+                    _context.AppUsers.Update(acc);
+                    await _context.SaveChangesAsync();
+                    return Ok(new
+                    {
+                        status = 200,
+                        msg = "Đã mở khoá tài khoản"
+                    });
+                }
+                acc.IsLocked=true;
+                _context.AppUsers.Update(acc);
+                await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    status=200,
+                    msg="Đã khoá tài khoản"
+                });
+            }
+            return BadRequest();
+        }
+
+        [HttpPost]
+        [Route("editAcount")]
+
+        public async Task<IActionResult> EditAccount(EditAccountModel model)
+        {
+            var user= await  userManager.FindByIdAsync(model.Id);
+            if(user!=null)
+            {
+                var result= await userManager.ChangePasswordAsync(user, user.PasswordHash,model.Password);
+                user.Email=model.Email;
+                user.PhoneNumber = model.Phone;
+                user.ShippingAddress = model.Address;
+                _context.Update(user);
+                _context.SaveChanges();
+                if(result.Succeeded)
+                {
+                    return Ok(new
+                    {
+                        status = 200,
+                        msg = "Đã cập nhật thông tin tài khoản"
+                    }) ;
+                }
+            
+            }
+            return Ok(new
+            {
+                status = 500,
+                msg = "Cập nhật tài khoản thất bại"
+            });
+
+
         }
 
         [HttpPost]
@@ -55,7 +147,9 @@ namespace DATN.Controllers
         {
           
             var user = await userManager.FindByNameAsync(model.Username);
-            if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
+          
+            
+            if (user != null && await userManager.CheckPasswordAsync(user, model.Password)&&user.IsLocked==false)
             {
                 var userRoles = await userManager.GetRolesAsync(user);
 
@@ -104,7 +198,10 @@ namespace DATN.Controllers
 
                 });
             }
-            return Unauthorized();
+            return Unauthorized(new
+            {
+                status=400
+            });
         }
 
         [HttpPost]
@@ -122,7 +219,10 @@ namespace DATN.Controllers
                 UserName = model.Username,
                 PhoneNumber=model.Phone,
                 Avatar=model.Avatar,
-                AccoutType="User"
+                AccoutType="User",
+                FullName=model.FullName,
+                ShippingAddress=model.ShippingAddress,
+                IsLocked=false
                
             };
             var result = await userManager.CreateAsync(user, model.Password);
@@ -145,7 +245,10 @@ namespace DATN.Controllers
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-                AccoutType ="Admin"
+                AccoutType ="Admin",
+                FullName = model.FullName,
+                ShippingAddress = model.ShippingAddress,
+                IsLocked =false
             };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)

@@ -2,6 +2,8 @@
 using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NBitcoin.Payment;
+using Newtonsoft.Json.Linq;
 
 namespace DATN.Areas.API.Controllers
 {
@@ -112,12 +114,23 @@ namespace DATN.Areas.API.Controllers
                 iv.ShippingPhone = Phone;
                 iv.Total = total;
                 iv.Status = false;
+                iv.Complete = false;
                 _context.Add(iv);
                 await _context.SaveChangesAsync();
 
                 foreach (var c in cart)
                 {
-                
+                    var pro=await _context.Product.FindAsync(c.ProductId);
+                    if(pro.Quantily<c.Quantity)
+                    {
+                        return Ok(new
+                        {
+                            status = 500,
+                            msg = "Số lượn sản phẩm không đủ"
+                        });
+                    }
+                    pro.Quantily-=c.Quantity;
+                    _context.Update(pro);
                     var ivd = new InvoiceDetail();
                     ivd.InvoiceId = iv.Id;
                     ivd.ProductId = c.ProductId;
@@ -129,10 +142,20 @@ namespace DATN.Areas.API.Controllers
                     _context.Cart.Remove(c);
                     await _context.SaveChangesAsync();
                 }
-                _context.Remove(cart);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Remove(cart);
+                    await _context.SaveChangesAsync();
+                }catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
         
-                return Ok("Dat hang thanh cong");
+                return Ok(new
+                {
+                    status=200,
+                    msg="Đặt hàng thành công"
+                });
             }
             return NoContent();
         }
@@ -155,7 +178,11 @@ namespace DATN.Areas.API.Controllers
                 iv.Status = true;
                 _context.Update(iv);
                 await _context.SaveChangesAsync();
-                return Ok("Duyet don thanh cong");
+                return Ok(new
+                {
+                    status=200,
+                    msg="Duyệt đơn thành công"
+                });
             }
             return NoContent();
         }
@@ -205,6 +232,39 @@ namespace DATN.Areas.API.Controllers
             var imp= _context.importedInvoice.Where(i => i.DateImport >= start && i.DateImport < end).Sum(i => i.Total);
 
             return Ok(result-imp);
+        }
+
+
+        [HttpPost]
+
+        public async Task<ActionResult> TestPayment()
+        {
+
+            string endpoint = "https://test-payment.momo.vn/gw_payment/transactionProcessor";
+            string partnerCode = "MOMOH6FA20220615";
+            string accessKey = "HZkfnYZPjF9vffEE";
+            string serectKey = "z4lYOkaeVZDibVmTTMX9cZlC6ldm7WmE";
+
+
+            JObject requestP = new JObject()
+            {
+                {"partnerCode",partnerCode },
+                {"accessKey",accessKey },
+                {"requestId",152 },
+                {"amount",100000 },
+                {"orderId",123 },
+                {"returnUrl","http://localhost:4200/admint" },
+                {"notifyUrl","http://localhost:4200/admin" },
+                {"requestType","captureMoMoWallet" },
+            };
+
+            HttpClient client = new HttpClient();
+            
+           var a= await  client.PostAsJsonAsync(endpoint, requestP);
+
+            var b = 5;
+            
+            return Ok();
         }
     }
 }

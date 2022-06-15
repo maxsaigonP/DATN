@@ -55,6 +55,7 @@ namespace DATN.Areas.API.Controllers
                          where a.Id==id
                          select new
                          {
+                             Id=a.Id,
                              Name=a.Name,
                              Category=a.Category.Name,
                              Price= a.Price,
@@ -62,7 +63,13 @@ namespace DATN.Areas.API.Controllers
                              Stock=a.Quantily,
                              TradeMark=a.TradeMark,
                              Star=a.Star,
-                             Image=a.Image
+                             Image=a.Image,
+                             CPU=a.CPU,
+                             DesignStyle=a.DesignStyle,
+                             Monitor=a.Monitor,
+                             RAM=a.RAM,
+                             SizeWeight=a.SizeWeight,
+                             VGA=a.VGA
                          }).FirstOrDefault();
 
          
@@ -89,11 +96,23 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Product>> Search(string txtSearch)
+        public async Task<ActionResult> Search(string txtSearch)
         {
-            txtSearch = txtSearch.ToLower();
-            var pro = await _context.Product.Where(p=>p.Name.ToLower().Contains(txtSearch)).ToListAsync();
-            return pro;
+            var result = (from a in _context.Product
+                          where a.Name.Contains(txtSearch)
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              Category = a.CategoryId,
+                              Price = a.Price,
+                              Description = a.Description,
+                              Stock = a.Quantily,
+                              TradeMark = a.TradeMark,
+                              Star = a.Star,
+                              Image = a.Image
+                          }).ToList();
+            return Ok(result);
         }
 
 
@@ -194,7 +213,7 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+       
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _context.Product.FindAsync(id);
@@ -206,10 +225,121 @@ namespace DATN.Areas.API.Controllers
             }
             _context.Product.Remove(product);
             await _context.SaveChangesAsync();
-            return Ok("Delete success");
+            return Ok(new
+            {
+                status=200
+            });
         }
 
 
-       
+
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> PostProduct1( ProductCreateModel product)
+        {
+
+            var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
+            var trade = await _context.TradeMarks.Where(t => t.Name.ToUpper().Equals(product.TradeMark.ToUpper())).ToListAsync();
+            if (pro.Count != 0)
+            {
+                return BadRequest("Sản phẩm đã tồn tại");
+            }
+            if (ModelState.IsValid)
+            {
+                var npro = new Product()
+                {
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    TradeMark = product.TradeMark,
+                    Quantily = product.Quantily,
+                    Star = product.Star,
+                    CPU = product.CPU,
+                    RAM = product.RAM,
+                    DesignStyle = product.DesignStyle,
+                    SizeWeight = product.SizeWeight,
+                    VGA = product.VGA,
+                    Status = true,
+                    CategoryId= product.CategoryId,
+                    Monitor=product.Monitor,
+
+                };
+
+
+                _context.Add(npro);
+                await _context.SaveChangesAsync();
+
+                //try
+                //{
+                   
+
+                //    if (ImageFile != null)
+                //    {
+
+                //        var fileName = npro.Id.ToString() + Path.GetExtension(ImageFile.FileName);
+                //        var uploadPath = Path.Combine(Url);
+                //        var filePath = Path.Combine(uploadPath, fileName);
+                //        using (FileStream fs = System.IO.File.Create(filePath))
+                //        {
+                //           ImageFile.CopyTo(fs);
+                //            fs.Flush();
+                //        }
+                //        npro.Image = fileName;
+                //        product.Star = 5;
+                //        if (trade.Count == 0)
+                //        {
+                //            var tr = new TradeMark();
+                //            tr.Name = product.TradeMark.ToUpper();
+                //            _context.TradeMarks.Add(tr);
+                //        }
+                //        _context.Update(product);
+                //        await _context.SaveChangesAsync();
+
+                //        var img = new Images();
+                //        img.Image = fileName;
+                //        img.ProductId = npro.Id;
+
+                //        _context.Add(img);
+                //        await _context.SaveChangesAsync();
+                //    }
+                //}
+                //catch (Exception ex)
+                //{
+
+                //}
+                return Ok(new
+                {
+                    status=200
+                });
+            }
+
+            return Ok();
+        }
+
+
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> Testimg(ProductCreateModel modle)
+        {
+
+            try
+            {
+                var formCollection = await Request.ReadFormAsync();
+                var file = formCollection.Files.First();
+                var folderName = Path.Combine("Resources", "Images");
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                if (file.Length > 0)
+                {
+                   
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
     }
 }

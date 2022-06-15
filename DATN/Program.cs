@@ -2,6 +2,7 @@
 using DATN.Data;
 using DATN.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,12 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
+});
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
@@ -62,7 +69,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseCors();
 
 app.UseAuthentication();

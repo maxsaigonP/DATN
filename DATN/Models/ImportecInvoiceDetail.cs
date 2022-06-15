@@ -16,8 +16,9 @@ namespace DATN.Models
         [DisplayName("Số lượng")]
         public int Quantity { get; set; }
         [DisplayName("Giá tiền")]
-        [DisplayFormat(DataFormatString = "{0:#,##0} VNĐ")]
         public decimal Price { get; set; }
+
+        public DateTime Date { get; set; }
 
     }
 }

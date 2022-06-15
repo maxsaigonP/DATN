@@ -24,6 +24,8 @@ namespace DATN.Models
         public Product Product { get; set; }
         [DisplayName("Đánh giá")]
         public int Star { get; set; }
+
+        public int ReplyId { get; set; }
         
         public bool Status { get; set; }
     }

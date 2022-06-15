@@ -51,6 +51,25 @@ namespace DATN.Areas.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+
+        public async Task<ActionResult> SearchCategory(string txtSearch)
+        {
+            var cate = await _context.Category.ToListAsync();
+
+            var result = (from a in _context.Category
+                          where a.Name.Contains(txtSearch)
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              TotalProduct = (from b in _context.Product
+                                              where b.CategoryId == a.Id
+                                              select b).Count()
+                          }).ToList();
+            return Ok(result);
+        }
+
         [HttpPost]  
         public async Task<IActionResult> PostCategory([FromBody] Category category)
         {
