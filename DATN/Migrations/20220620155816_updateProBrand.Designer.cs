@@ -4,6 +4,7 @@ using DATN.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220620155816_updateProBrand")]
+    partial class updateProBrand
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -412,9 +414,6 @@ namespace DATN.Migrations
                     b.Property<string>("DesignStyle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HardDisk")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
@@ -428,12 +427,6 @@ namespace DATN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OS")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Port")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
@@ -441,9 +434,6 @@ namespace DATN.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RAM")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReleaseTime")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SalePrice")

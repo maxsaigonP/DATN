@@ -2,6 +2,7 @@
 using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MoMo;
 using NBitcoin.Payment;
 using Newtonsoft.Json.Linq;
 
@@ -21,13 +22,71 @@ namespace DATN.Areas.API.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
         [HttpGet]
-         public async Task<IActionResult> GetInvoice()
+        public async Task<IActionResult> GetInvoice()
         {
             var result = (from a in _context.Invoice
                           join b in _context.AppUsers on a.AppUserId equals b.Id
                           select new
                           {
-                              Id=a.Id,
+                              Id = a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total
+                          }).ToArray();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetInvoiceUser(string id)
+        {
+            var result = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.AppUserId== id
+                          select new
+                          {
+                              Id = a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total,
+                              Status=a.Status
+                          }).ToArray();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ThongKeTheoThoiGian(DateTime start,DateTime end)
+        {
+            var result = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.IssuedDate>=start && a.IssuedDate<=end
+                          select new
+                          {
+                              Id = a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total
+                          }).ToArray();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ThongKeTheoThang(int month)
+        {
+            var result = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.IssuedDate.Value.Month == month
+                          select new
+                          {
+                              Id = a.Id,
                               Username = b.UserName,
                               ShippingAddress = a.ShippingAddress,
                               Phone = a.ShippingPhone,
@@ -93,17 +152,17 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpPost]
-         
-        public async Task<IActionResult> Create(string id,string Address,string Phone)
-        {
-            
 
-            var cart =  _context.Cart.Where(c => c.AppUserId == id&&c.Status==false).ToList();
+        public async Task<IActionResult> Create(string id, string Address, string Phone)
+        {
+
+
+            var cart = _context.Cart.Where(c => c.AppUserId == id && c.Status == false).ToList();
             var total = 0;
 
             if (cart != null)
             {
-                foreach(var c in cart)
+                foreach (var c in cart)
                 {
                     total = total + (UnitPrice(c.ProductId) * c.Quantity);
                 }
@@ -120,8 +179,8 @@ namespace DATN.Areas.API.Controllers
 
                 foreach (var c in cart)
                 {
-                    var pro=await _context.Product.FindAsync(c.ProductId);
-                    if(pro.Quantily<c.Quantity)
+                    var pro = await _context.Product.FindAsync(c.ProductId);
+                    if (pro.Quantily < c.Quantity)
                     {
                         return Ok(new
                         {
@@ -129,7 +188,7 @@ namespace DATN.Areas.API.Controllers
                             msg = "Số lượn sản phẩm không đủ"
                         });
                     }
-                    pro.Quantily-=c.Quantity;
+                    pro.Quantily -= c.Quantity;
                     _context.Update(pro);
                     var ivd = new InvoiceDetail();
                     ivd.InvoiceId = iv.Id;
@@ -138,7 +197,7 @@ namespace DATN.Areas.API.Controllers
                     ivd.UnitPrice = UnitPrice(c.ProductId) * c.Quantity;
                     ivd.Status = true;
                     _context.Add(ivd);
-                
+
                     _context.Cart.Remove(c);
                     await _context.SaveChangesAsync();
                 }
@@ -146,15 +205,16 @@ namespace DATN.Areas.API.Controllers
                 {
                     _context.Remove(cart);
                     await _context.SaveChangesAsync();
-                }catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     return BadRequest(ex.Message);
                 }
-        
+
                 return Ok(new
                 {
-                    status=200,
-                    msg="Đặt hàng thành công"
+                    status = 200,
+                    msg = "Đặt hàng thành công"
                 });
             }
             return NoContent();
@@ -171,8 +231,8 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<IActionResult> DuyetDon(int id)
         {
-            var iv= await _context.Invoice.FindAsync(id);
-            if (ModelState.IsValid&&iv!=null)
+            var iv = await _context.Invoice.FindAsync(id);
+            if (ModelState.IsValid && iv != null)
             {
 
                 iv.Status = true;
@@ -180,8 +240,8 @@ namespace DATN.Areas.API.Controllers
                 await _context.SaveChangesAsync();
                 return Ok(new
                 {
-                    status=200,
-                    msg="Duyệt đơn thành công"
+                    status = 200,
+                    msg = "Duyệt đơn thành công"
                 });
             }
             return NoContent();
@@ -229,9 +289,9 @@ namespace DATN.Areas.API.Controllers
         {
             var result = _context.Invoice.Where(i => i.IssuedDate >= start && i.IssuedDate < end).Sum(i => i.Total);
 
-            var imp= _context.importedInvoice.Where(i => i.DateImport >= start && i.DateImport < end).Sum(i => i.Total);
+            var imp = _context.importedInvoice.Where(i => i.DateImport >= start && i.DateImport < end).Sum(i => i.Total);
 
-            return Ok(result-imp);
+            return Ok(result - imp);
         }
 
 
@@ -239,32 +299,67 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<ActionResult> TestPayment()
         {
-
             string endpoint = "https://test-payment.momo.vn/gw_payment/transactionProcessor";
             string partnerCode = "MOMOH6FA20220615";
             string accessKey = "HZkfnYZPjF9vffEE";
-            string serectKey = "z4lYOkaeVZDibVmTTMX9cZlC6ldm7WmE";
+            string serectkey = "z4lYOkaeVZDibVmTTMX9cZlC6ldm7WmE";
+            string orderInfo = "áaaaaa";
+            string redirectUrl = "http://localhost:4200/admin";
+            string ipnUrl = "http://localhost:4200/admin";
+            string requestType = "captureWallet";
+
+            string amount = "100000";
+            string orderId = Guid.NewGuid().ToString();
+            string requestId = Guid.NewGuid().ToString();
+            string extraData = "";
 
 
-            JObject requestP = new JObject()
+            string rawHash = "accessKey=" + accessKey +
+                "&amount=" + amount +
+                "&extraData=" + extraData +
+                "&notifyUrl=" + ipnUrl +
+                "&orderId=" + orderId +
+                "&orderInfo=" + orderInfo +
+                "&partnerCode=" + partnerCode +
+                "&returnUrl=" + redirectUrl +
+                "&requestId=" + requestId +
+                "&requestType=" + requestType
+                ;
+
+
+
+            MoMoSecurity crypto = new MoMoSecurity();
+
+            string signature = crypto.signSHA256(rawHash, serectkey);
+
+
+       
+            JObject message = new JObject
             {
-                {"partnerCode",partnerCode },
-                {"accessKey",accessKey },
-                {"requestId",152 },
-                {"amount",100000 },
-                {"orderId",123 },
-                {"returnUrl","http://localhost:4200/admint" },
-                {"notifyUrl","http://localhost:4200/admin" },
-                {"requestType","captureMoMoWallet" },
+                { "partnerCode", partnerCode },
+                { "partnerName", "Test" },
+    
+                { "requestId", requestId },
+                { "amount", amount },
+                { "orderId", orderId },
+                { "orderInfo", orderInfo },
+                { "returnUrl", redirectUrl },
+                { "notifyUrl", ipnUrl },
+
+                { "extraData", extraData },
+                { "requestType", requestType },
+                { "signature", "c8264690a8de274ce86a3d4189887b703548b9bc0568d9e1a3e5e68659bdd409 " }
+
             };
 
-            HttpClient client = new HttpClient();
-            
-           var a= await  client.PostAsJsonAsync(endpoint, requestP);
+            string responseFromMomo = PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
 
-            var b = 5;
-            
-            return Ok();
+            JObject jmessage = JObject.Parse(responseFromMomo);
+
+            return Ok(new
+            {
+                msg = jmessage.GetValue("payUrl")
+            });
         }
     }
 }

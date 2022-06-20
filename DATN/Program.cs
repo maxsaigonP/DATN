@@ -17,6 +17,7 @@ builder.Services.Configure<FormOptions>(o =>
     o.MultipartBodyLengthLimit = int.MaxValue;
     o.MemoryBufferThreshold = int.MaxValue;
 });
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(

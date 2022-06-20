@@ -3,6 +3,7 @@ using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
 
 namespace DATN.Areas.API.Controllers
 {
@@ -31,6 +32,7 @@ namespace DATN.Areas.API.Controllers
         public async Task<ActionResult> Show()
         {
             var result = (from a in _context.Product
+                          join b in _context.TradeMarks on a.TradeMarkId equals b.Id
                           select new
                           {
                               Id=a.Id,
@@ -39,10 +41,53 @@ namespace DATN.Areas.API.Controllers
                               Price = a.Price,
                               Description = a.Description,
                               Stock = a.Quantily,
+                              TradeMark = b.Name,
+                              Star = a.Star,
+                              Image = a.Image,
+                              HardDisk=a.HardDisk,
+                              Port=a.Port,
+                              Os=a.OS,
+                              ReleaseTime=a.ReleaseTime,
+                          }).ToArray();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ShowNews()
+        {
+            var result = (from a in _context.Product
+                          orderby a.Id descending
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              Category = a.Category.Name,
+                              Price = a.Price,
+                              Description = a.Description,
+                              Stock = a.Quantily,
                               TradeMark = a.TradeMark,
                               Star = a.Star,
                               Image = a.Image
-                          }).ToArray();
+                          }).Take(6).ToArray();
+            return Ok(result);
+        }
+        [HttpGet]
+        public async Task<ActionResult> ShowTop()
+        {
+            var result = (from a in _context.Product
+                          orderby a.Star descending
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              Category = a.Category.Name,
+                              Price = a.Price,
+                              Description = a.Description,
+                              Stock = a.Quantily,
+                              TradeMark = a.TradeMark,
+                              Star = a.Star,
+                              Image = a.Image
+                          }).Take(6).ToArray();
             return Ok(result);
         }
 
@@ -52,16 +97,19 @@ namespace DATN.Areas.API.Controllers
            
 
             var result= (from a in _context.Product
+                         join b in _context.TradeMarks on a.TradeMarkId equals b.Id
                          where a.Id==id
                          select new
                          {
                              Id=a.Id,
                              Name=a.Name,
+                             CategoryId=a.CategoryId,
                              Category=a.Category.Name,
                              Price= a.Price,
                              Description=a.Description,
                              Stock=a.Quantily,
-                             TradeMark=a.TradeMark,
+                             TradeMark=b.Name,
+                             TradeMarkId=b.Id,
                              Star=a.Star,
                              Image=a.Image,
                              CPU=a.CPU,
@@ -69,7 +117,12 @@ namespace DATN.Areas.API.Controllers
                              Monitor=a.Monitor,
                              RAM=a.RAM,
                              SizeWeight=a.SizeWeight,
-                             VGA=a.VGA
+                             VGA=a.VGA,
+                             HardDisk=a.HardDisk,
+                             Port=a.Port,
+                             OS=a.OS,
+                             ReleaseTime=a.ReleaseTime,
+
                          }).FirstOrDefault();
 
          
@@ -116,70 +169,37 @@ namespace DATN.Areas.API.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> PostProduct([FromForm] Product product)
-        {
-           
-            var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
-            var trade= await _context.TradeMarks.Where(t=>t.Name.ToUpper().Equals(product.TradeMark.ToUpper())).ToListAsync();
-            if(pro.Count!=0)
-            {
-                return BadRequest("Sản phẩm đã tồn tại");
-            }
-            if (ModelState.IsValid)
-            {
-
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                if (product.ImageFile != null)
-                {
-                    
-                     var fileName = product.Id.ToString() + Path.GetExtension(product.ImageFile.FileName);
-                    var uploadPath = Path.Combine(Url);
-                    var filePath = Path.Combine(uploadPath, fileName);
-                    using (FileStream fs = System.IO.File.Create(filePath))
-                    {
-                        product.ImageFile.CopyTo(fs);
-                        fs.Flush();
-                    }
-                    product.Image = fileName;
-                    product.Star = 5;
-                    if (trade.Count == 0)
-                    {
-                        var tr = new TradeMark();
-                        tr.Name = product.TradeMark.ToUpper();
-                        _context.TradeMarks.Add(tr);
-                    }
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-
-                    var img = new Images();
-                    img.Image = fileName;
-                    img.ProductId= product.Id;
-                   
-                    _context.Add(img);
-                    await _context.SaveChangesAsync();
-                }
-                return Ok();
-            }
-
-            return Ok();
-        }
+       
 
         [HttpPost]
-        public async Task<IActionResult> Update(int id,[FromForm] Product product)
+        public async Task<IActionResult> Update(int id,[FromBody] Product product)
         {
 
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
+         
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(product);
+                    var npro = await _context.Product.FindAsync(id);
+
+                    npro.Name = product.Name;
+                    npro.Description = product.Description;
+                    npro.Price = product.Price;
+                    npro.TradeMark = product.TradeMark;
+                    npro.Quantily = product.Quantily;
+                    npro.Star = product.Star;
+                    npro.CPU = product.CPU;
+                    npro.RAM = product.RAM;
+                    npro.DesignStyle = product.DesignStyle;
+                    npro.SizeWeight = product.SizeWeight;
+                    npro.VGA = product.VGA;
+                    npro.Status = true;
+                    npro.CategoryId = product.CategoryId;
+                    npro.Monitor = product.Monitor;
+
+                    _context.Update(npro);   
+                  
                     if (product.ImageFile != null)
                     {
                         var fileDelete = Path.Combine(Url, product.Image);
@@ -238,7 +258,7 @@ namespace DATN.Areas.API.Controllers
         {
 
             var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
-            var trade = await _context.TradeMarks.Where(t => t.Name.ToUpper().Equals(product.TradeMark.ToUpper())).ToListAsync();
+         
             if (pro.Count != 0)
             {
                 return BadRequest("Sản phẩm đã tồn tại");
@@ -250,7 +270,7 @@ namespace DATN.Areas.API.Controllers
                     Name = product.Name,
                     Description = product.Description,
                     Price = product.Price,
-                    TradeMark = product.TradeMark,
+                    TradeMarkId = product.TradeMarkId,
                     Quantily = product.Quantily,
                     Star = product.Star,
                     CPU = product.CPU,
@@ -261,6 +281,11 @@ namespace DATN.Areas.API.Controllers
                     Status = true,
                     CategoryId= product.CategoryId,
                     Monitor=product.Monitor,
+                    HardDisk=product.HardDisk,
+                    OS=product.OS,
+                    Port=product.Port,
+                    ReleaseTime=product.ReleaseTime,
+                    
 
                 };
 
@@ -268,47 +293,10 @@ namespace DATN.Areas.API.Controllers
                 _context.Add(npro);
                 await _context.SaveChangesAsync();
 
-                //try
-                //{
-                   
-
-                //    if (ImageFile != null)
-                //    {
-
-                //        var fileName = npro.Id.ToString() + Path.GetExtension(ImageFile.FileName);
-                //        var uploadPath = Path.Combine(Url);
-                //        var filePath = Path.Combine(uploadPath, fileName);
-                //        using (FileStream fs = System.IO.File.Create(filePath))
-                //        {
-                //           ImageFile.CopyTo(fs);
-                //            fs.Flush();
-                //        }
-                //        npro.Image = fileName;
-                //        product.Star = 5;
-                //        if (trade.Count == 0)
-                //        {
-                //            var tr = new TradeMark();
-                //            tr.Name = product.TradeMark.ToUpper();
-                //            _context.TradeMarks.Add(tr);
-                //        }
-                //        _context.Update(product);
-                //        await _context.SaveChangesAsync();
-
-                //        var img = new Images();
-                //        img.Image = fileName;
-                //        img.ProductId = npro.Id;
-
-                //        _context.Add(img);
-                //        await _context.SaveChangesAsync();
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-
-                //}
                 return Ok(new
                 {
-                    status=200
+                    status=200,
+                    id=npro.Id,
                 });
             }
 
@@ -317,7 +305,7 @@ namespace DATN.Areas.API.Controllers
 
 
         [HttpPost, DisableRequestSizeLimit]
-        public async Task<IActionResult> Testimg(ProductCreateModel modle)
+        public async Task<IActionResult> Testimg()
         {
 
             try
@@ -328,7 +316,18 @@ namespace DATN.Areas.API.Controllers
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
                 if (file.Length > 0)
                 {
-                   
+                   var fileName=ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    var path = Path.Combine(Url, fileName);
+                    using (var stream = new FileStream(path,FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
+                    var id=int.Parse(fileName.Split('.')[0]);
+                    var pro=await _context.Product.FindAsync(id);
+                    pro.Image = fileName;
+                    _context.Update(pro);
+                    await _context.SaveChangesAsync();
                     return Ok();
                 }
                 else

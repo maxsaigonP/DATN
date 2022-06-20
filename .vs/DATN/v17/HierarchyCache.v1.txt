@@ -1,0 +1,243 @@
+﻿++Solution 'DATN' ‎(1 of 1 project)
+i:{00000000-0000-0000-0000-000000000000}:DATN.sln
+++DATN
+i:{00000000-0000-0000-0000-000000000000}:DATN
+++Connected Services 
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>845
+++Dependencies
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>844
+++Properties
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\properties\
+++wwwroot
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\wwwroot\
+++Areas
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\
+++API
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\
+++Controllers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\controllers\
+++CartController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\cartcontroller.cs
+++CategoryController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\categorycontroller.cs
+++CommentController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\commentcontroller.cs
+++ImportController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\importcontroller.cs
+++InvoiceController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\invoicecontroller.cs
+++ProductController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\productcontroller.cs
+++SupplierController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\suppliercontroller.cs
+++TradeMarkController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\trademarkcontroller.cs
+++WishListController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\controllers\wishlistcontroller.cs
+++Data
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\data\
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\data\
+++Models
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\models\
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\
+++Views
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\areas\api\views\
+++ApplicationDbContext.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\data\applicationdbcontext.cs
+++Migrations
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\
+++AppUser.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\appuser.cs
+++Cart.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\cart.cs
+++Category.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\category.cs
+++Comment.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\comment.cs
+++EditAccountModel.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\editaccountmodel.cs
+++Images.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\images.cs
+++ImportecInvoiceDetail.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\importecinvoicedetail.cs
+++ImportedInvoice.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\importedinvoice.cs
+++ImportItems.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\importitems.cs
+++Invoice.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\invoice.cs
+++InvoiceDetail.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\invoicedetail.cs
+++Log.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\log.cs
+++LoginModel.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\loginmodel.cs
+++Product.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\product.cs
+++ProductCreateModel.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\productcreatemodel.cs
+++RegisterModel.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\registermodel.cs
+++Response.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\response.cs
+++SlideShow.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\slideshow.cs
+++Supplier.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\supplier.cs
+++TradeMark.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\trademark.cs
+++UserRoles.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\userroles.cs
+++WishList.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\models\wishlist.cs
+++appsettings.json
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\appsettings.json
+++log4net.config
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\log4net.config
+++MoMoSecurity.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\momosecurity.cs
+++PaymentRequest.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\paymentrequest.cs
+++Program.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\program.cs
+++ScaffoldingReadMe.txt
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\scaffoldingreadme.txt
+++WeatherForecast.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\weatherforecast.cs
+++No service dependencies discovered
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>846
+++Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:analyzers
+++Frameworks
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:frameworks
+++Packages
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:packages
+++launchSettings.json
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\properties\launchsettings.json
+++images
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\wwwroot\images\
+++AuthenticateController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\controllers\authenticatecontroller.cs
+++WeatherForecastController.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\controllers\weatherforecastcontroller.cs
+++20220524133101_First.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220524133101_first.cs
+++20220524145711_addmodels.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220524145711_addmodels.cs
+++20220526073310_ud.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220526073310_ud.cs
+++20220603104119_sd.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220603104119_sd.cs
+++20220608115436_updatecart.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220608115436_updatecart.cs
+++20220609133216_updateTrad.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220609133216_updatetrad.cs
+++20220609133629_updateCate.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220609133629_updatecate.cs
+++20220610084415_updateUS.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220610084415_updateus.cs
+++20220610092522_updateUS1.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220610092522_updateus1.cs
+++20220610125807_new23.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220610125807_new23.cs
+++20220612105125_update-pro-iv.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220612105125_update-pro-iv.cs
+++20220612113333_updateACC.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220612113333_updateacc.cs
+++20220613112219_updateCMT.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220613112219_updatecmt.cs
+++20220615130746_newSP.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220615130746_newsp.cs
+++20220615134517_newII.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220615134517_newii.cs
+++20220615170716_updateItem.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220615170716_updateitem.cs
+++ApplicationDbContextModelSnapshot.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\applicationdbcontextmodelsnapshot.cs
+++appsettings.Development.json
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\appsettings.development.json
+++MessagePackAnalyzer
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\.nuget\packages\messagepackanalyzer\2.1.152\analyzers\dotnet\messagepackanalyzer.dll
+++Microsoft.AspNetCore.Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\sdk\6.0.202\sdks\microsoft.net.sdk.web\analyzers\cs\microsoft.aspnetcore.analyzers.dll
+++Microsoft.AspNetCore.App.Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.4\analyzers\dotnet\cs\microsoft.aspnetcore.app.analyzers.dll
+++Microsoft.AspNetCore.App.CodeFixes
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.4\analyzers\dotnet\cs\microsoft.aspnetcore.app.codefixes.dll
+++Microsoft.AspNetCore.Components.Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\sdk\6.0.202\sdks\microsoft.net.sdk.web\analyzers\cs\microsoft.aspnetcore.components.analyzers.dll
+++Microsoft.AspNetCore.Mvc.Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\sdk\6.0.202\sdks\microsoft.net.sdk.web\analyzers\cs\microsoft.aspnetcore.mvc.analyzers.dll
+++Microsoft.AspNetCore.Razor.SourceGenerator.Tooling.Internal
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\sdk\6.0.202\sdks\microsoft.net.sdk.razor\source-generators\microsoft.aspnetcore.razor.sourcegenerator.tooling.internal.dll
+++Microsoft.CodeAnalysis.Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\.nuget\packages\microsoft.codeanalysis.analyzers\3.3.2\analyzers\dotnet\cs\microsoft.codeanalysis.analyzers.dll
+++Microsoft.CodeAnalysis.CSharp.Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\.nuget\packages\microsoft.codeanalysis.analyzers\3.3.2\analyzers\dotnet\cs\microsoft.codeanalysis.csharp.analyzers.dll
+++Microsoft.CodeAnalysis.CSharp.NetAnalyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\sdk\6.0.202\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.csharp.netanalyzers.dll
+++Microsoft.CodeAnalysis.NetAnalyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\sdk\6.0.202\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.netanalyzers.dll
+++Microsoft.EntityFrameworkCore.Analyzers
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\.nuget\packages\microsoft.entityframeworkcore.analyzers\6.0.5\analyzers\dotnet\cs\microsoft.entityframeworkcore.analyzers.dll
+++Microsoft.Extensions.Logging.Generators
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.4\analyzers\dotnet\roslyn4.0\cs\microsoft.extensions.logging.generators.dll
+++Microsoft.NET.Sdk.Razor.SourceGenerators
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\sdk\6.0.202\sdks\microsoft.net.sdk.razor\source-generators\microsoft.net.sdk.razor.sourcegenerators.dll
+++System.Text.Json.SourceGeneration
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\program files\dotnet\packs\microsoft.netcore.app.ref\6.0.4\analyzers\dotnet\cs\system.text.json.sourcegeneration.dll
+++Microsoft.AspNetCore.App
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\microsoft.aspnetcore.app
+++Microsoft.NETCore.App
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\microsoft.netcore.app
+++Microsoft.AspNetCore.Authentication.JwtBearer (6.0.5)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>871
+++Microsoft.AspNetCore.Identity (2.2.0)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>869
+++Microsoft.AspNetCore.Identity.EntityFrameworkCore (6.0.5)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>870
+++Microsoft.EntityFrameworkCore.SqlServer (6.0.5)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>867
+++Microsoft.EntityFrameworkCore.Tools (6.0.5)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>873
+++Microsoft.VisualStudio.Web.CodeGeneration.Design (6.0.5)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>874
+++NBitcoin (7.0.8)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>872
+++Swashbuckle.AspNetCore (6.3.0)
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:>868
+++product
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\wwwroot\images\product\
+++20220524133101_First.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220524133101_first.designer.cs
+++20220524145711_addmodels.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220524145711_addmodels.designer.cs
+++20220526073310_ud.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220526073310_ud.designer.cs
+++20220603104119_sd.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220603104119_sd.designer.cs
+++20220608115436_updatecart.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220608115436_updatecart.designer.cs
+++20220609133216_updateTrad.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220609133216_updatetrad.designer.cs
+++20220609133629_updateCate.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220609133629_updatecate.designer.cs
+++20220610084415_updateUS.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220610084415_updateus.designer.cs
+++20220610092522_updateUS1.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220610092522_updateus1.designer.cs
+++20220610125807_new23.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220610125807_new23.designer.cs
+++20220612105125_update-pro-iv.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220612105125_update-pro-iv.designer.cs
+++20220612113333_updateACC.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220612113333_updateacc.designer.cs
+++20220613112219_updateCMT.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220613112219_updatecmt.designer.cs
+++20220615130746_newSP.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220615130746_newsp.designer.cs
+++20220615134517_newII.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220615134517_newii.designer.cs
+++20220615170716_updateItem.Designer.cs
+i:{20669d5e-bde3-4ca2-8f2c-acde35606164}:c:\users\bao phuc- pc\onedrive\desktop\da_totnghiep\datn\datn\migrations\20220615170716_updateitem.designer.cs

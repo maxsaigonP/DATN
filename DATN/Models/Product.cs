@@ -21,6 +21,7 @@ namespace DATN.Models
         [Required(ErrorMessage = "Không được bỏ trống")]
         public string? Description { get; set; }
 
+        public int? ImportPrice { get; set; }
         public int Price { get; set; }
 
         public int? SalePrice { get; set; }
@@ -34,9 +35,13 @@ namespace DATN.Models
         public Category? Category { get; set; }
 
         [DisplayName("Thương hiệu")]
-        public string? TradeMark { get; set; }
+        public int TradeMarkId { get; set; }
+        public TradeMark? TradeMark { get; set; }
 
+        public string? Port{ get; set; }
+        public string? OS { get; set; }
 
+        public string? HardDisk { get; set; }
         [DisplayName("CPU")]
         public string? CPU { get; set; }
 
@@ -55,6 +60,8 @@ namespace DATN.Models
 
         [DisplayName("Thiết kế")]
         public string? DesignStyle { get; set; }
+
+        public string? ReleaseTime { get; set; }
 
 
         [DisplayName("Kích thước-trọng lượng")]
@@ -80,5 +87,8 @@ namespace DATN.Models
         public List<SlideShow>? SlideShows { get; set; }
         public List<Images>? Images { get; set; }
         public List<WishList>? WishLists { get; set; }
+
+        public List<ImportecInvoiceDetail>? ImportecInvoiceDetails { get; set; }
+        public List<ImportItems>? ImportItems { get; set; }
     }
 }

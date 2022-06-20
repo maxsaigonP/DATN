@@ -4,6 +4,7 @@ using DATN.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220615170716_updateItem")]
+    partial class updateItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -412,9 +414,6 @@ namespace DATN.Migrations
                     b.Property<string>("DesignStyle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HardDisk")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
@@ -428,12 +427,6 @@ namespace DATN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OS")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Port")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
@@ -441,9 +434,6 @@ namespace DATN.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RAM")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReleaseTime")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SalePrice")
@@ -458,8 +448,8 @@ namespace DATN.Migrations
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<int>("TradeMarkId")
-                        .HasColumnType("int");
+                    b.Property<string>("TradeMark")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VGA")
                         .HasColumnType("nvarchar(max)");
@@ -467,8 +457,6 @@ namespace DATN.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("TradeMarkId");
 
                     b.ToTable("Product");
                 });
@@ -828,15 +816,7 @@ namespace DATN.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Models.TradeMark", "TradeMark")
-                        .WithMany("Products")
-                        .HasForeignKey("TradeMarkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("TradeMark");
                 });
 
             modelBuilder.Entity("DATN.Models.SlideShow", b =>
@@ -956,11 +936,6 @@ namespace DATN.Migrations
                     b.Navigation("SlideShows");
 
                     b.Navigation("WishLists");
-                });
-
-            modelBuilder.Entity("DATN.Models.TradeMark", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

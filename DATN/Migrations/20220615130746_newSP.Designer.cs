@@ -4,6 +4,7 @@ using DATN.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220615130746_newSP")]
+    partial class newSP
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,6 +225,9 @@ namespace DATN.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ImportedInvoiceId")
                         .HasColumnType("int");
 
@@ -267,33 +272,6 @@ namespace DATN.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("importedInvoice");
-                });
-
-            modelBuilder.Entity("DATN.Models.ImportItems", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ImportItems");
                 });
 
             modelBuilder.Entity("DATN.Models.Invoice", b =>
@@ -412,9 +390,6 @@ namespace DATN.Migrations
                     b.Property<string>("DesignStyle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HardDisk")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
@@ -428,12 +403,6 @@ namespace DATN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OS")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Port")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
@@ -441,9 +410,6 @@ namespace DATN.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RAM")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReleaseTime")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SalePrice")
@@ -458,8 +424,8 @@ namespace DATN.Migrations
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<int>("TradeMarkId")
-                        .HasColumnType("int");
+                    b.Property<string>("TradeMark")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VGA")
                         .HasColumnType("nvarchar(max)");
@@ -467,8 +433,6 @@ namespace DATN.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("TradeMarkId");
 
                     b.ToTable("Product");
                 });
@@ -769,23 +733,12 @@ namespace DATN.Migrations
                         .IsRequired();
 
                     b.HasOne("DATN.Models.Product", "Product")
-                        .WithMany("ImportecInvoiceDetails")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ImportedInvoice");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("DATN.Models.ImportItems", b =>
-                {
-                    b.HasOne("DATN.Models.Product", "Product")
-                        .WithMany("ImportItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Product");
                 });
@@ -828,15 +781,7 @@ namespace DATN.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DATN.Models.TradeMark", "TradeMark")
-                        .WithMany("Products")
-                        .HasForeignKey("TradeMarkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("TradeMark");
                 });
 
             modelBuilder.Entity("DATN.Models.SlideShow", b =>
@@ -947,20 +892,11 @@ namespace DATN.Migrations
 
                     b.Navigation("Images");
 
-                    b.Navigation("ImportItems");
-
-                    b.Navigation("ImportecInvoiceDetails");
-
                     b.Navigation("InvoiceDetails");
 
                     b.Navigation("SlideShows");
 
                     b.Navigation("WishLists");
-                });
-
-            modelBuilder.Entity("DATN.Models.TradeMark", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

@@ -70,16 +70,24 @@ namespace DATN.Areas.API.Controllers
             
             if(comment!=null)
             {
-                _context.Comment.Remove(comment);
-                _context.SaveChanges();
+                comment.Content = content;
+                comment.Star = star;
+                comment.Time = DateTime.Now;
+                _context.Comment.Update(comment);
+              
                 var rate1 =  _context.Comment.Where(c => c.ProductId == productID&&c.ReplyId==0).ToList();
                 var avgStar1 = rate1.Average(c => c.Star);
 
                 var pro1 = _context.Product.Find(productID);
                 pro1.Star = Math.Round(avgStar1, 1);
                 _context.Product.Update(pro1);
-                _context.SaveChanges();
-     
+               await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    status = 200,
+                    msg = "Đã gửi bình luận"
+                });
+
 
             }
 
