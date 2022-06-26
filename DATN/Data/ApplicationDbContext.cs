@@ -23,6 +23,7 @@ namespace DATN.Data
         public DbSet<DATN.Models.TradeMark>? TradeMarks { get; set; }
         public DbSet<DATN.Models.WishList>? WishList { get; set; }
         public DbSet<DATN.Models.Supplier>? Supplier { get; set; }
+        public DbSet<DATN.Models.SlideShow>? SlideShow { get; set; }
 
         public DbSet<DATN.Models.ImportItems>? ImportItems { get; set; }
         public DbSet<DATN.Models.AppUser>? AppUsers { get; set; }

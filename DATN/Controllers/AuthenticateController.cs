@@ -251,7 +251,15 @@ namespace DATN.Controllers
             var userExists = await userManager.FindByNameAsync(model.Username);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
-
+            var us = await _context.AppUsers.Where(u => u.Email == model.Email).ToListAsync();
+            if (us.Count > 0)
+            {
+                return Ok(new
+                {
+                    status = 500,
+                    msg = "Email already exits"
+                });
+            }
             AppUser user = new AppUser()
             {
                 Email = model.Email,

@@ -84,7 +84,7 @@ namespace DATN.Models
 
         public List<InvoiceDetail>? InvoiceDetails { get; set; }
         public List<Comment>? Comments { get; set; }
-        public List<SlideShow>? SlideShows { get; set; }
+
         public List<Images>? Images { get; set; }
         public List<WishList>? WishLists { get; set; }
 

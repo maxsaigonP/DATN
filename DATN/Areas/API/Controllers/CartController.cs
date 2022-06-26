@@ -87,7 +87,10 @@ namespace DATN.Areas.API.Controllers
             _context.Update(cart);
             await _context.SaveChangesAsync();
 
-            return Ok("Da them vao gio hang");
+            return Ok(new
+            {
+                status=200
+            });
         }
 
         [HttpPost]
@@ -122,7 +125,11 @@ namespace DATN.Areas.API.Controllers
                 }
               
                 await  _context.SaveChangesAsync();
-                return Ok("Da xoa toan bo gio hang");
+                return Ok(new
+                {
+                    status=200,
+                    msg="Đã xoá toàn bộ giỏ hàng "
+                });
             }
 
 

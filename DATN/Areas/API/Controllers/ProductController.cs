@@ -13,7 +13,7 @@ namespace DATN.Areas.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public string Url = "C:\\Users\\BAO PHUC- PC\\DATN\\src\\assets\\img\\product";
+        public string Url = "C:\\Users\\BAO PHUC- PC\\DATN\\src\\assets\\img\\product\\";
 
         public ProductController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -167,9 +167,28 @@ namespace DATN.Areas.API.Controllers
                           }).ToList();
             return Ok(result);
         }
+        [HttpGet]
+        public async Task<ActionResult> GetProductByCategory(int id)
+        {
+            var result = (from a in _context.Product
+                          where a.CategoryId.Equals(id)
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              Category = a.CategoryId,
+                              Price = a.Price,
+                              Description = a.Description,
+                              Stock = a.Quantily,
+                              TradeMark = a.TradeMark,
+                              Star = a.Star,
+                              Image = a.Image
+                          }).ToList();
+            return Ok(result);
+        }
 
 
-       
+
 
         [HttpPost]
         public async Task<IActionResult> Update(int id,[FromBody] Product product)
@@ -187,7 +206,7 @@ namespace DATN.Areas.API.Controllers
                     npro.Description = product.Description;
                     npro.Price = product.Price;
                     npro.TradeMark = product.TradeMark;
-                    npro.Quantily = product.Quantily;
+                    
                     npro.Star = product.Star;
                     npro.CPU = product.CPU;
                     npro.RAM = product.RAM;
@@ -197,36 +216,24 @@ namespace DATN.Areas.API.Controllers
                     npro.Status = true;
                     npro.CategoryId = product.CategoryId;
                     npro.Monitor = product.Monitor;
+                    npro.HardDisk = product.HardDisk;
+                    npro.OS = product.OS;
+                    npro.Port = product.Port;
+                    npro.ReleaseTime = product.ReleaseTime;
 
                     _context.Update(npro);   
                   
-                    if (product.ImageFile != null)
-                    {
-                        var fileDelete = Path.Combine(Url, product.Image);
-                        FileInfo file = new FileInfo(fileDelete);
-                        file.Delete();
-                    }
-                    if (product.ImageFile != null)
-                    {
-                        var fileName = product.Id.ToString() + Path.GetExtension(product.ImageFile.FileName);
-                        var uploadPath = Path.Combine(Url);
-                        var filePath = Path.Combine(uploadPath, fileName);
-                        using (FileStream fs = System.IO.File.Create(filePath))
-                        {
-                            product.ImageFile.CopyTo(fs);
-                            fs.Flush();
-                        }
-                        product.Image = fileName;
-                        _context.Update(product);
-                        await _context.SaveChangesAsync();
-                    }
+                   
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     
                 }
-                return RedirectToAction(nameof(Index));
+                return Ok(new
+                {
+                    status=200,
+                });
             }
            
             return Ok("Update success");
@@ -325,6 +332,62 @@ namespace DATN.Areas.API.Controllers
 
                     var id=int.Parse(fileName.Split('.')[0]);
                     var pro=await _context.Product.FindAsync(id);
+                    pro.Image = fileName;
+                    _context.Update(pro);
+
+                    //var img = new Images();
+                    //img.ProductId = id;
+                    //img.Image=
+                    await _context.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+
+        //
+
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> Upload()
+        {
+            
+
+            try
+            {
+                var formCollection = await Request.ReadFormAsync();
+                var file = formCollection.Files.First();
+           
+                if (file.Length > 0)
+                {
+                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                   
+
+                    var id = int.Parse(fileName.Split('.')[0]);
+                    var pro = await _context.Product.FindAsync(id);
+              
+
+                    //
+
+                    string FileName = pro.Image;
+                    string Path1 = Url + FileName;
+                    FileInfo file1 = new FileInfo(Path1);
+                    if (file1.Exists)
+                    {
+                        file1.Delete();
+                    }
+                    var path = Path.Combine(Url, fileName);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
                     pro.Image = fileName;
                     _context.Update(pro);
                     await _context.SaveChangesAsync();

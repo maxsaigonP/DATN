@@ -11,6 +11,7 @@ namespace DATN.Models
         [DisplayName("Mô tả")]
         public string Description { get; set; }
         [DisplayName("Thời gian")]
+     
         public DateTime CreatedDate { get; set; }
     }
 }

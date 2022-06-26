@@ -44,6 +44,7 @@ namespace DATN.Areas.API.Controllers
             var imp = (from a in _context.ImportecInvoiceDetail
                        join b in _context.Product on a.ProductId equals b.Id
                        join c in _context.Supplier on a.SupplierId equals c.Id
+                       join d in _context.importedInvoice on a.ImportedInvoiceId equals d.Id
                        where a.ImportedInvoiceId==id
                        select new
                        {
@@ -52,7 +53,9 @@ namespace DATN.Areas.API.Controllers
                            TenSanPham=b.Name,
                            SoLuong=a.Quantity,
                            Gia=a.Price*a.Quantity,
-                           NhaCungCap=c.SupplierName
+                           NhaCungCap=c.SupplierName,
+                           Total=d.Total
+                         
                        }).ToList();
 
             return Ok(imp);

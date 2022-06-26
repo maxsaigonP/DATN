@@ -299,7 +299,7 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<ActionResult> TestPayment()
         {
-            string endpoint = "https://test-payment.momo.vn/gw_payment/transactionProcessor";
+            string endpoint = "https://test-payment.momo.vn/v2/gateway/api/pos";
             string partnerCode = "MOMOH6FA20220615";
             string accessKey = "HZkfnYZPjF9vffEE";
             string serectkey = "z4lYOkaeVZDibVmTTMX9cZlC6ldm7WmE";
@@ -348,7 +348,7 @@ namespace DATN.Areas.API.Controllers
 
                 { "extraData", extraData },
                 { "requestType", requestType },
-                { "signature", "c8264690a8de274ce86a3d4189887b703548b9bc0568d9e1a3e5e68659bdd409 " }
+                { "signature", signature }
 
             };
 
