@@ -33,10 +33,16 @@ namespace DATN.Areas.API.Controllers
                               ShippingAddress = a.ShippingAddress,
                               Phone = a.ShippingPhone,
                               Date = a.IssuedDate,
-                              Total = a.Total
+                              Total = a.Total,
+                              Status=a.Status,
+                              Complete=a.Complete,
                           }).ToArray();
 
-            return Ok(result);
+            return Ok(new
+            {
+                inv=result,
+                count=result.Count()
+            });
         }
 
         [HttpGet]
@@ -53,7 +59,8 @@ namespace DATN.Areas.API.Controllers
                               Phone = a.ShippingPhone,
                               Date = a.IssuedDate,
                               Total = a.Total,
-                              Status=a.Status
+                              Status=a.Status,
+                              Complete=a.Complete
                           }).ToArray();
 
             return Ok(result);
@@ -64,7 +71,7 @@ namespace DATN.Areas.API.Controllers
         {
             var result = (from a in _context.Invoice
                           join b in _context.AppUsers on a.AppUserId equals b.Id
-                          where a.IssuedDate>=start && a.IssuedDate<=end
+                          where a.IssuedDate>=start && a.IssuedDate<=end && a.Complete==true
                           select new
                           {
                               Id = a.Id,
@@ -247,6 +254,27 @@ namespace DATN.Areas.API.Controllers
             return NoContent();
         }
 
+        [HttpPost]
+
+        public async Task<IActionResult> HoanThanh(int id)
+        {
+            var iv = await _context.Invoice.FindAsync(id);
+            if (ModelState.IsValid && iv != null)
+            {
+
+                iv.Complete = true;
+                _context.Update(iv);
+                await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    status = 200
+                });
+            }
+            return NoContent();
+        }
+
+       
+
 
         [HttpPost]
 
@@ -287,9 +315,53 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<ActionResult> ThongKe(DateTime start, DateTime end)
         {
-            var result = _context.Invoice.Where(i => i.IssuedDate >= start && i.IssuedDate < end).Sum(i => i.Total);
+            var inv = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.IssuedDate>=start && a.IssuedDate<=end
+                          select new
+                          {
+                              Id = a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total,
+                              Status = a.Status,
+                              Complete = a.Complete,
+                          }).ToArray();
+
+            var slNhap= (from a in _context.ImportecInvoiceDetail
+                         join b in _context.importedInvoice on a.ImportedInvoiceId equals b.Id
+                         where b.DateImport>=start && b.DateImport<=end
+                         select a.Quantity).Sum();
+            var slBan = (from a in _context.invoiceDetail
+                          join b in _context.Invoice on a.InvoiceId equals b.Id
+                          where b.IssuedDate >= start && b.IssuedDate <= end.AddDays(1)
+                          select a.Quantity).Sum();
+            var result = _context.Invoice.Where(i => i.IssuedDate >= start && i.IssuedDate < end&&i.Complete==true).Sum(i => i.Total);
 
             var imp = _context.importedInvoice.Where(i => i.DateImport >= start && i.DateImport < end).Sum(i => i.Total);
+
+            
+
+            return Ok(new
+            {
+                inv=inv,
+                importTotal=imp,
+                saleTotal=result,
+                importQuantily=slNhap,
+                saleQuantily = slBan
+
+            });
+        }
+
+        [HttpGet]
+
+        public async Task<ActionResult> ThongKeTheoTuan(DateTime start)
+        {
+            var result = _context.Invoice.Where(i => i.IssuedDate >= start ).Sum(i => i.Total);
+
+            var imp = _context.importedInvoice.Where(i => i.DateImport >= start && i.DateImport < start).Sum(i => i.Total);
 
             return Ok(result - imp);
         }

@@ -38,6 +38,7 @@ namespace DATN.Areas.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
         public async Task<IActionResult> PostSlideshow(SlideShow slide)
         {
             if(ModelState.IsValid)
@@ -144,6 +145,25 @@ namespace DATN.Areas.API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex}");
             }
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _context.SlideShow.FindAsync(id);
+            if (product.Image!= null)
+            {
+                var fileDelete = Path.Combine(Url, product.Image);
+                FileInfo file = new FileInfo(fileDelete);
+                file.Delete();
+            }
+            _context.SlideShow.Remove(product);
+            await _context.SaveChangesAsync();
+            return Ok(new
+            {
+                status = 200
+            });
         }
     }
 }

@@ -49,7 +49,12 @@ namespace DATN.Areas.API.Controllers
                               Os=a.OS,
                               ReleaseTime=a.ReleaseTime,
                           }).ToArray();
-            return Ok(result);
+
+            return Ok(new
+            {
+                pro=result,
+                count=result.Count()
+            });
         }
 
         [HttpGet]
@@ -187,6 +192,25 @@ namespace DATN.Areas.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public async Task<ActionResult> GetProductByBrand(int id)
+        {
+            var result = (from a in _context.Product
+                          where a.TradeMarkId.Equals(id)
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              Category = a.CategoryId,
+                              Price = a.Price,
+                              Description = a.Description,
+                              Stock = a.Quantily,
+                              TradeMark = a.TradeMark,
+                              Star = a.Star,
+                              Image = a.Image
+                          }).ToList();
+            return Ok(result);
+        }
 
 
 
@@ -246,7 +270,7 @@ namespace DATN.Areas.API.Controllers
             var product = await _context.Product.FindAsync(id);
             if (product.ImageFile != null)
             {
-                var fileDelete = Path.Combine("C:\\Users\\BAO PHUC- PC\\OneDrive\\Desktop\\Hmart - Electronics eCommerce HTML Template\\hmart\\assets\\images\\product-image", product.Image);
+                var fileDelete = Path.Combine(Url,product.Image);
                 FileInfo file = new FileInfo(fileDelete);
                 file.Delete();
             }

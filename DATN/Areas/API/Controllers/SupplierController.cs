@@ -33,7 +33,11 @@ namespace DATN.Areas.API.Controllers
                           Address=a.Address
                       }).ToList();
 
-            return Ok(sup);
+            return Ok(new
+            {
+                sup=sup,
+                count=sup.Count,
+            });
         }
 
         [HttpPost]

@@ -22,7 +22,7 @@ namespace DATN.Areas.API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetCart(string userid)
-        {
+        {   
             var result = (from a in _context.Cart
                           join b in _context.Product on a.ProductId equals b.Id
                           where a.AppUserId == userid
@@ -40,7 +40,12 @@ namespace DATN.Areas.API.Controllers
                                             select c).Count()
                           }).ToList();
 
-            return Ok(result);
+            var total = result.Sum(s => s.Gia);
+            return Ok(new
+            {
+                cart= result,
+                total=total,
+            });
         }
 
 
@@ -49,6 +54,12 @@ namespace DATN.Areas.API.Controllers
         public async Task<IActionResult> AddCart(int sanPham,int soLuong,string userID)
         {
             var check = await _context.Cart.Where(c => c.ProductId == sanPham&&c.AppUserId==userID).FirstOrDefaultAsync();
+            var pro = await _context.Product.FindAsync(sanPham);
+           
+            if (soLuong > pro.Quantily)
+            {
+                return BadRequest("Số lượng sản phẩm không đủ");
+            }
             if (check != null)
             {
                 check.Quantity += soLuong;
@@ -79,7 +90,13 @@ namespace DATN.Areas.API.Controllers
         public async Task<IActionResult> UpdateCart(int cartID,int sl)
         {
             var cart = await _context.Cart.FindAsync(cartID);
+            var proid = cart.ProductId;
+            var pro = await _context.Product.FindAsync(proid);
             cart.Quantity+=sl;
+            if(cart.Quantity>pro.Quantily)
+            {
+                return BadRequest("Số lượng sản phẩm không đủ");
+            }
             if(cart.Quantity<=0)
             {
                 cart.Quantity = 0;

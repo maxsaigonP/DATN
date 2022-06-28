@@ -51,7 +51,14 @@ namespace DATN.Controllers
                             AccoutType=a.AccoutType,
                             IsLocked=a.IsLocked,
                         }).ToList();
-            return Ok(result);
+            var acc = await _context.AppUsers.ToListAsync();
+           
+            return Ok(new
+            {
+                acc=result,
+                count = acc.Count()
+        });
+         
         }
 
         [HttpGet]
