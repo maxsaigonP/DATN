@@ -32,13 +32,14 @@ namespace DATN.Areas.API.Controllers
         public async Task<ActionResult> Show()
         {
             var result = (from a in _context.Product
-                          join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                          join b in _context.TradeMarks on a.TradeMarkId equals b.Id                  
                           select new
                           {
                               Id=a.Id,
                               Name = a.Name,
                               Category = a.Category.Name,
                               Price = a.Price,
+                              SalePrice=a.SalePrice,
                               Description = a.Description,
                               Stock = a.Quantily,
                               TradeMark = b.Name,
@@ -68,6 +69,7 @@ namespace DATN.Areas.API.Controllers
                               Name = a.Name,
                               Category = a.Category.Name,
                               Price = a.Price,
+                              SalePrice = a.SalePrice,
                               Description = a.Description,
                               Stock = a.Quantily,
                               TradeMark = a.TradeMark,
@@ -87,6 +89,7 @@ namespace DATN.Areas.API.Controllers
                               Name = a.Name,
                               Category = a.Category.Name,
                               Price = a.Price,
+                              SalePrice = a.SalePrice,
                               Description = a.Description,
                               Stock = a.Quantily,
                               TradeMark = a.TradeMark,
@@ -111,7 +114,8 @@ namespace DATN.Areas.API.Controllers
                              CategoryId=a.CategoryId,
                              Category=a.Category.Name,
                              Price= a.Price,
-                             Description=a.Description,
+                             SalePrice = a.SalePrice,
+                             Description =a.Description,
                              Stock=a.Quantily,
                              TradeMark=b.Name,
                              TradeMarkId=b.Id,
@@ -129,12 +133,18 @@ namespace DATN.Areas.API.Controllers
                              ReleaseTime=a.ReleaseTime,
 
                          }).FirstOrDefault();
-
+            var img= (from a in _context.Images
+                      where a.ProductId==id
+                      select new
+                      {
+                          Image=a.Image
+                      }).ToList();
          
-            return Ok(
-            
-                result
-
+            return Ok(new
+            {
+                pro=result,
+                img=img
+            }
             );
         }
 
@@ -164,6 +174,7 @@ namespace DATN.Areas.API.Controllers
                               Name = a.Name,
                               Category = a.CategoryId,
                               Price = a.Price,
+                              SalePrice=a.SalePrice,
                               Description = a.Description,
                               Stock = a.Quantily,
                               TradeMark = a.TradeMark,
@@ -268,6 +279,21 @@ namespace DATN.Areas.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _context.Product.FindAsync(id);
+            var img = await _context.Images.Where(c => c.ProductId == id).ToListAsync();
+            if(img.Count>0)
+            {
+                foreach(var i in img)
+                {
+                    if (i.Image!=null)
+                    {
+                        var fileDelete = Path.Combine(Url, i.Image);
+                        FileInfo file = new FileInfo(fileDelete);
+                        file.Delete();
+                    }
+                    _context.Product.Remove(product);
+                    await _context.SaveChangesAsync();
+                }
+            }
             if (product.ImageFile != null)
             {
                 var fileDelete = Path.Combine(Url,product.Image);
@@ -316,6 +342,7 @@ namespace DATN.Areas.API.Controllers
                     OS=product.OS,
                     Port=product.Port,
                     ReleaseTime=product.ReleaseTime,
+                    SalePrice=0,
                     
 
                 };
@@ -336,44 +363,57 @@ namespace DATN.Areas.API.Controllers
 
 
         [HttpPost, DisableRequestSizeLimit]
-        public async Task<IActionResult> Testimg()
+        public async Task<IActionResult> Testimg(int id1)
         {
 
             try
             {
+                int count = 0;
                 var formCollection = await Request.ReadFormAsync();
-                var file = formCollection.Files.First();
+                //var file = formCollection.Files.First();
                 var folderName = Path.Combine("Resources", "Images");
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                if (file.Length > 0)
+               foreach(var file in formCollection.Files)
                 {
-                   var fileName=ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    var path = Path.Combine(Url, fileName);
-                    using (var stream = new FileStream(path,FileMode.Create))
+                    count++;
+                    if (file.Length > 0)
                     {
-                        file.CopyTo(stream);
+                        var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        var fname = id1.ToString() + "_" + count.ToString() + "." + fileName.Split('.')[1];
+                        var path = Path.Combine(Url, fname);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            file.CopyTo(stream);
+                        }
+
+
+                        if(count==1)
+                        {
+                            var pro = await _context.Product.FindAsync(id1);
+                            pro.Image = fname;
+                            _context.Update(pro);
+                        }
+                       
+
+                        var img = new Images();
+                        img.ProductId = id1;
+                        img.Image = fname;
+                        _context.Add(img);
+                        await _context.SaveChangesAsync();
+                    
                     }
-
-                    var id=int.Parse(fileName.Split('.')[0]);
-                    var pro=await _context.Product.FindAsync(id);
-                    pro.Image = fileName;
-                    _context.Update(pro);
-
-                    //var img = new Images();
-                    //img.ProductId = id;
-                    //img.Image=
-                    await _context.SaveChangesAsync();
-                    return Ok();
+                    else
+                    {
+                        return BadRequest();
+                    }
                 }
-                else
-                {
-                    return BadRequest();
-                }
+                return Ok();
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex}");
             }
+            return BadRequest();
         }
 
 
@@ -426,6 +466,111 @@ namespace DATN.Areas.API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex}");
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Promotion(SaleOffModel sale)
+        {
+            try
+            {
+
+
+                if (sale.Brand == 0)
+                {
+                    if (sale.Cate == 0)
+                    {
+                        var product = await _context.Product.FindAsync(sale.Pro);
+                        if (product != null)
+                        {
+                            if (sale.Percent != 0)
+                            {
+                                product.SalePrice =product.Price- product.Price * sale.Percent / 100;
+                            }
+                            if (sale.Price != 0)
+                            {
+                                product.SalePrice = product.Price - sale.Price;
+                            }
+
+                            _context.Update(product);
+                            await _context.SaveChangesAsync();
+                            return Ok(new
+                            {
+                                status = 200,
+
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var product = await _context.Product.Where(p => p.CategoryId == sale.Cate).ToListAsync();
+                        if (product.Count > 0)
+                        {
+                            if (sale.Percent != 0)
+                            {
+                                foreach (var p in product)
+                                {
+                                    p.SalePrice = p.Price- p.Price * sale.Percent / 100;
+                                    _context.Update(p);
+                                    await _context.SaveChangesAsync();
+                                }
+                            }
+                            if (sale.Price != 0)
+                            {
+                                foreach (var p in product)
+                                {
+                                    p.SalePrice = p.Price - sale.Price;
+                                    _context.Update(p);
+                                    await _context.SaveChangesAsync();
+                                }
+                            }
+
+
+                            return Ok(new
+                            {
+                                status = 200,
+
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    var product = await _context.Product.Where(p => p.TradeMarkId == sale.Brand).ToListAsync();
+                    if (product.Count > 0)
+                    {
+                        if (sale.Percent != 0)
+                        {
+                            foreach (var p in product)
+                            {
+                                p.SalePrice = p.Price- p.Price * sale.Percent / 100;
+                                _context.Update(p);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                        if (sale.Price != 0)
+                        {
+                            foreach (var p in product)
+                            {
+                                p.SalePrice = p.Price - sale.Price;
+                                _context.Update(p);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+
+
+                        return Ok(new
+                        {
+                            status = 200,
+
+                        });
+                    }
+                }
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return BadRequest();
         }
     }
 }

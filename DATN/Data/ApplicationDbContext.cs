@@ -27,6 +27,7 @@ namespace DATN.Data
 
         public DbSet<DATN.Models.ImportItems>? ImportItems { get; set; }
         public DbSet<DATN.Models.AppUser>? AppUsers { get; set; }
+        public DbSet<DATN.Models.About>? About { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

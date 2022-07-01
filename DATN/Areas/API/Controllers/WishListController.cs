@@ -61,7 +61,7 @@ namespace DATN.Areas.API.Controllers
                              Image=b.Image,
                              IdSanPham=a.ProductId,
                              TenSanPham=b.Name,
-                             Gia=b.Price,
+                             Gia=b.SalePrice==0?b.Price:b.SalePrice,
                              Soluong= (from c in _context.WishList
                                        where c.AppUserId==userID
                                        select c).Count()

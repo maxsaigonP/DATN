@@ -191,6 +191,7 @@ namespace DATN.Controllers
                     claims: authClaims,
                     
                     
+                    
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
 

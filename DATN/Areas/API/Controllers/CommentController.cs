@@ -25,10 +25,12 @@ namespace DATN.Areas.API.Controllers
         {
             var result= (from a in _context.Comment
                          join b in _context.Product on a.ProductId equals b.Id
+                         join c in _context.AppUsers on a.AppUserId equals c.Id
                          select new
                          {
                              Id=a.Id,
                              UserId=a.AppUserId,
+                             UserName=c.UserName,
                              NoiDung=a.Content,
                              IdSanPham=a.ProductId,
                              TenSanPham=b.Name,

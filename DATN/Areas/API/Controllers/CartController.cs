@@ -34,7 +34,7 @@ namespace DATN.Areas.API.Controllers
                               IdSanPham = a.ProductId,
                               SoLuong = a.Quantity,
                               GiaSanPham=b.Price,
-                              Gia = b.Price * a.Quantity,
+                              Gia =b.SalePrice==0?b.Price:b.SalePrice * a.Quantity,
                               SoLuongCart= (from c in _context.Cart
                                             where c.AppUserId == userid
                                             select c).Count()
@@ -58,8 +58,13 @@ namespace DATN.Areas.API.Controllers
            
             if (soLuong > pro.Quantily)
             {
-                return BadRequest("Số lượng sản phẩm không đủ");
+                return Ok(new
+                {
+                    status=500,
+                    msg="Số lượng sản phẩm không đủ"
+                });
             }
+            
             if (check != null)
             {
                 check.Quantity += soLuong;
@@ -155,6 +160,7 @@ namespace DATN.Areas.API.Controllers
         }
 
 
+     
 
        
     }

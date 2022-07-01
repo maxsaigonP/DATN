@@ -162,7 +162,7 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<IActionResult> Create(string id, string Address, string Phone)
         {
-
+            
 
             var cart = _context.Cart.Where(c => c.AppUserId == id && c.Status == false).ToList();
             var total = 0;
@@ -201,6 +201,7 @@ namespace DATN.Areas.API.Controllers
                     ivd.InvoiceId = iv.Id;
                     ivd.ProductId = c.ProductId;
                     ivd.Quantity = c.Quantity;
+                    
                     ivd.UnitPrice = UnitPrice(c.ProductId) * c.Quantity;
                     ivd.Status = true;
                     _context.Add(ivd);
@@ -231,6 +232,10 @@ namespace DATN.Areas.API.Controllers
         public int UnitPrice(int id)
         {
             var pr = _context.Product.Find(id);
+            if(pr.SalePrice!=0)
+            {
+                return pr.SalePrice;
+            }
             return pr.Price;
         }
 
@@ -367,71 +372,7 @@ namespace DATN.Areas.API.Controllers
         }
 
 
-        [HttpPost]
-
-        public async Task<ActionResult> TestPayment()
-        {
-            string endpoint = "https://test-payment.momo.vn/v2/gateway/api/pos";
-            string partnerCode = "MOMOH6FA20220615";
-            string accessKey = "HZkfnYZPjF9vffEE";
-            string serectkey = "z4lYOkaeVZDibVmTTMX9cZlC6ldm7WmE";
-            string orderInfo = "áaaaaa";
-            string redirectUrl = "http://localhost:4200/admin";
-            string ipnUrl = "http://localhost:4200/admin";
-            string requestType = "captureWallet";
-
-            string amount = "100000";
-            string orderId = Guid.NewGuid().ToString();
-            string requestId = Guid.NewGuid().ToString();
-            string extraData = "";
-
-
-            string rawHash = "accessKey=" + accessKey +
-                "&amount=" + amount +
-                "&extraData=" + extraData +
-                "&notifyUrl=" + ipnUrl +
-                "&orderId=" + orderId +
-                "&orderInfo=" + orderInfo +
-                "&partnerCode=" + partnerCode +
-                "&returnUrl=" + redirectUrl +
-                "&requestId=" + requestId +
-                "&requestType=" + requestType
-                ;
-
-
-
-            MoMoSecurity crypto = new MoMoSecurity();
-
-            string signature = crypto.signSHA256(rawHash, serectkey);
-
-
+        
        
-            JObject message = new JObject
-            {
-                { "partnerCode", partnerCode },
-                { "partnerName", "Test" },
-    
-                { "requestId", requestId },
-                { "amount", amount },
-                { "orderId", orderId },
-                { "orderInfo", orderInfo },
-                { "returnUrl", redirectUrl },
-                { "notifyUrl", ipnUrl },
-
-                { "extraData", extraData },
-                { "requestType", requestType },
-                { "signature", signature }
-
-            };
-
-            string responseFromMomo = PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
-
-            JObject jmessage = JObject.Parse(responseFromMomo);
-
-            return Ok(new
-            {
-                msg = jmessage.GetValue("payUrl")
-            });
-        }
     }
 }

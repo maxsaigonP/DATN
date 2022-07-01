@@ -130,7 +130,10 @@ namespace DATN.Areas.API.Controllers
                     _context.Remove(category);
                     await _context.SaveChangesAsync();
                 }
-                return Ok(category.Name);
+                return Ok(new
+                {
+                    status=200
+                });
             }
 
             return BadRequest();

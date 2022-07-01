@@ -24,7 +24,7 @@ namespace DATN.Models
         public int? ImportPrice { get; set; }
         public int Price { get; set; }
 
-        public int? SalePrice { get; set; }
+        public int SalePrice { get; set; }
         [DisplayName("Số lượng")]
         public int? Quantily { get; set; }
 
