@@ -16,7 +16,7 @@ namespace DATN.Models
 
         public string? Title { get; set; }
         [Required(ErrorMessage = "Không được bỏ trống"), MaxLength(100, ErrorMessage = "Tối đa 100 ký tự")]
-        public string? Content { get; set; }
+        public string? Link { get; set; }
         [Required(ErrorMessage = "Không được bỏ trống")]
         public string? Image { get; set; }
 

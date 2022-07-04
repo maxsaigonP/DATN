@@ -367,7 +367,11 @@ namespace DATN.Controllers
                 }
                
             }
-            return Ok("Email không đúng");
+            return Ok(new
+            {
+                status=500,
+                msg="Email không đúng"
+            });
           
         }
 

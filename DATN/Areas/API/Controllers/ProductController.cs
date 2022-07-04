@@ -57,7 +57,21 @@ namespace DATN.Areas.API.Controllers
                 count=result.Count()
             });
         }
+        //
+        [HttpGet]
+        public async Task<ActionResult> TopSell()
+        {
+            var result =
+                (from item in _context.invoiceDetail
+                 group item.Quantity by item.ProductId into g
+                 orderby g.Sum() descending
+                 select g.Key).Take(5);
+                        return Ok(result);
+        }
 
+
+
+        //
         [HttpGet]
         public async Task<ActionResult> ShowNews()
         {
@@ -95,7 +109,7 @@ namespace DATN.Areas.API.Controllers
                               TradeMark = a.TradeMark,
                               Star = a.Star,
                               Image = a.Image
-                          }).Take(6).ToArray();
+                          }).Take(4).ToArray();
             return Ok(result);
         }
 
@@ -181,7 +195,11 @@ namespace DATN.Areas.API.Controllers
                               Star = a.Star,
                               Image = a.Image
                           }).ToList();
-            return Ok(result);
+            return Ok(new
+            {
+                pro = result,
+                count = result.Count()
+            });
         }
         [HttpGet]
         public async Task<ActionResult> GetProductByCategory(int id)
@@ -200,7 +218,11 @@ namespace DATN.Areas.API.Controllers
                               Star = a.Star,
                               Image = a.Image
                           }).ToList();
-            return Ok(result);
+            return Ok(new
+            {
+                pro = result,
+                count = result.Count()
+            });
         }
 
         [HttpGet]
@@ -220,7 +242,12 @@ namespace DATN.Areas.API.Controllers
                               Star = a.Star,
                               Image = a.Image
                           }).ToList();
-            return Ok(result);
+
+            return Ok(new
+            {
+                pro = result,
+                count = result.Count()
+            }) ;
         }
 
 
@@ -294,7 +321,7 @@ namespace DATN.Areas.API.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
-            if (product.ImageFile != null)
+            if (product.Image != null)
             {
                 var fileDelete = Path.Combine(Url,product.Image);
                 FileInfo file = new FileInfo(fileDelete);
@@ -313,6 +340,10 @@ namespace DATN.Areas.API.Controllers
         [HttpPost, DisableRequestSizeLimit]
         public async Task<IActionResult> PostProduct1( ProductCreateModel product)
         {
+            
+          
+           
+        
 
             var pro = await _context.Product.Where(p => p.Name == product.Name).ToListAsync();
          
@@ -361,6 +392,54 @@ namespace DATN.Areas.API.Controllers
             return Ok();
         }
 
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> UploadShow(int id1)
+        {
+
+            try
+            {
+                int count = 0;
+                var formCollection = await Request.ReadFormAsync();
+                var file = formCollection.Files.First();
+              
+                
+                    count++;
+                    if (file.Length > 0)
+                    {
+                        var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        var fname = id1.ToString() + "_Show"  + "." + fileName.Split('.')[1];
+                        var path = Path.Combine(Url, fname);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            file.CopyTo(stream);
+                        }
+
+
+                        if (count == 1)
+                        {
+                            var pro = await _context.Product.FindAsync(id1);
+                            pro.Image = fname;
+                            _context.Update(pro);
+                        }
+
+
+                    
+                        await _context.SaveChangesAsync();
+
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+            return BadRequest();
+        }
 
         [HttpPost, DisableRequestSizeLimit]
         public async Task<IActionResult> Testimg(int id1)
@@ -387,12 +466,7 @@ namespace DATN.Areas.API.Controllers
                         }
 
 
-                        if(count==1)
-                        {
-                            var pro = await _context.Product.FindAsync(id1);
-                            pro.Image = fname;
-                            _context.Update(pro);
-                        }
+                    
                        
 
                         var img = new Images();
@@ -420,7 +494,7 @@ namespace DATN.Areas.API.Controllers
         //
 
         [HttpPost, DisableRequestSizeLimit]
-        public async Task<IActionResult> Upload()
+        public async Task<IActionResult> Upload(int id)
         {
             
 
@@ -434,25 +508,28 @@ namespace DATN.Areas.API.Controllers
                     var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                    
 
-                    var id = int.Parse(fileName.Split('.')[0]);
+                    var fname= id.ToString()+"_Show."+ fileName.Split('.')[1];
                     var pro = await _context.Product.FindAsync(id);
               
 
                     //
 
-                    string FileName = pro.Image;
-                    string Path1 = Url + FileName;
-                    FileInfo file1 = new FileInfo(Path1);
-                    if (file1.Exists)
+                    
+                    string Path1 = Url + pro.Image;
+                   if(pro.Images!=null&&pro.Image!="")
                     {
-                        file1.Delete();
+                        FileInfo file1 = new FileInfo(Path1);
+                        if (file1.Exists)
+                        {
+                            file1.Delete();
+                        }
                     }
-                    var path = Path.Combine(Url, fileName);
+                    var path = Path.Combine(Url, fname);
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         file.CopyTo(stream);
                     }
-                    pro.Image = fileName;
+                    pro.Image = fname;
                     _context.Update(pro);
                     await _context.SaveChangesAsync();
                     return Ok();
@@ -466,6 +543,76 @@ namespace DATN.Areas.API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex}");
             }
+        }
+        //
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> UploadEdit(int id1)
+        {
+
+            try
+            {
+                int count = 0;
+                var formCollection = await Request.ReadFormAsync();
+                //var file = formCollection.Files.First();
+                var folderName = Path.Combine("Resources", "Images");
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                //
+                var img1 = await _context.Images.Where(i=>i.ProductId==id1).ToListAsync();
+
+
+                //
+
+                if(formCollection.Files[0]==null||img1==null)
+                {
+                    return BadRequest();
+                }
+                foreach (var i in img1)
+                {
+                    _context.Images.Remove(i);
+                    await _context.SaveChangesAsync();
+                    string Path1 = Url + i.Image;
+                    FileInfo file1 = new FileInfo(Path1);
+                    if (file1.Exists)
+                    {
+                        file1.Delete();
+                    }
+                }
+                foreach (var file in formCollection.Files)
+                {
+                    count++;
+                    if (file.Length > 0)
+                    {
+                        var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        var fname = id1.ToString() + "_" + count.ToString() + "." + fileName.Split('.')[1];
+                        var path = Path.Combine(Url, fname);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            file.CopyTo(stream);
+                        }
+
+
+
+
+
+                        var img = new Images();
+                        img.ProductId = id1;
+                        img.Image = fname;
+                        _context.Add(img);
+                        await _context.SaveChangesAsync();
+
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+            return BadRequest();
         }
 
         [HttpPost]
@@ -485,10 +632,18 @@ namespace DATN.Areas.API.Controllers
                             if (sale.Percent != 0)
                             {
                                 product.SalePrice =product.Price- product.Price * sale.Percent / 100;
+                                if(product.SalePrice<=0)
+                                {
+                                    product.SalePrice = 0;
+                                }
                             }
                             if (sale.Price != 0)
                             {
                                 product.SalePrice = product.Price - sale.Price;
+                                if (product.SalePrice <= 0)
+                                {
+                                    product.SalePrice = 0;
+                                }
                             }
 
                             _context.Update(product);
@@ -509,7 +664,11 @@ namespace DATN.Areas.API.Controllers
                             {
                                 foreach (var p in product)
                                 {
-                                    p.SalePrice = p.Price- p.Price * sale.Percent / 100;
+                                    p.SalePrice = p.Price- (p.Price * sale.Percent) / 100;
+                                    if (p.SalePrice <= 0)
+                                    {
+                                        p.SalePrice = 0;
+                                    }
                                     _context.Update(p);
                                     await _context.SaveChangesAsync();
                                 }
@@ -519,6 +678,10 @@ namespace DATN.Areas.API.Controllers
                                 foreach (var p in product)
                                 {
                                     p.SalePrice = p.Price - sale.Price;
+                                    if (p.SalePrice <= 0)
+                                    {
+                                        p.SalePrice = 0;
+                                    }
                                     _context.Update(p);
                                     await _context.SaveChangesAsync();
                                 }
@@ -543,6 +706,10 @@ namespace DATN.Areas.API.Controllers
                             foreach (var p in product)
                             {
                                 p.SalePrice = p.Price- p.Price * sale.Percent / 100;
+                                if (p.SalePrice <= 0)
+                                {
+                                    p.SalePrice = 0;
+                                }
                                 _context.Update(p);
                                 await _context.SaveChangesAsync();
                             }

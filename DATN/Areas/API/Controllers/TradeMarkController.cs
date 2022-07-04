@@ -44,7 +44,7 @@ namespace DATN.Areas.API.Controllers
                           {
                               Id = a.Id,
                               Name = a.Name,
-                          }).ToList();
+                          }).FirstOrDefault();
 
             return Ok(result);
         }
@@ -76,11 +76,11 @@ namespace DATN.Areas.API.Controllers
            ;    
         }
 
-        [HttpPost]
+        [HttpPut]
 
-        public async Task<IActionResult> EditTradeMark(TradeMark tradeMark)
+        public async Task<IActionResult> EditTradeMark(int id,TradeMark tradeMark)
         {
-            var check= await _context.TradeMarks.FindAsync(tradeMark.Id);
+            var check= await _context.TradeMarks.FindAsync(id);
             if(check==null)
             {
                 return BadRequest();
@@ -94,8 +94,8 @@ namespace DATN.Areas.API.Controllers
                 });
             }
 
-            
-            _context.TradeMarks.Add(tradeMark);
+            check.Name=tradeMark.Name;
+            _context.TradeMarks.Update(check);
             try
             {
                 await _context.SaveChangesAsync();

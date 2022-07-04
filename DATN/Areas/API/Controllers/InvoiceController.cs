@@ -26,6 +26,7 @@ namespace DATN.Areas.API.Controllers
         {
             var result = (from a in _context.Invoice
                           join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.Status == true
                           select new
                           {
                               Id = a.Id,
@@ -34,14 +35,14 @@ namespace DATN.Areas.API.Controllers
                               Phone = a.ShippingPhone,
                               Date = a.IssuedDate,
                               Total = a.Total,
-                              Status=a.Status,
-                              Complete=a.Complete,
+                              Status = a.Status,
+                              Complete = a.Complete,
                           }).ToArray();
 
             return Ok(new
             {
-                inv=result,
-                count=result.Count()
+                inv = result,
+                count = result.Count()
             });
         }
 
@@ -50,7 +51,7 @@ namespace DATN.Areas.API.Controllers
         {
             var result = (from a in _context.Invoice
                           join b in _context.AppUsers on a.AppUserId equals b.Id
-                          where a.AppUserId== id
+                          where a.AppUserId == id
                           select new
                           {
                               Id = a.Id,
@@ -59,19 +60,19 @@ namespace DATN.Areas.API.Controllers
                               Phone = a.ShippingPhone,
                               Date = a.IssuedDate,
                               Total = a.Total,
-                              Status=a.Status,
-                              Complete=a.Complete
+                              Status = a.Status,
+                              Complete = a.Complete
                           }).ToArray();
 
             return Ok(result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ThongKeTheoThoiGian(DateTime start,DateTime end)
+        public async Task<IActionResult> ThongKeTheoThoiGian(DateTime start, DateTime end)
         {
             var result = (from a in _context.Invoice
                           join b in _context.AppUsers on a.AppUserId equals b.Id
-                          where a.IssuedDate>=start && a.IssuedDate<=end && a.Complete==true
+                          where a.IssuedDate >= start && a.IssuedDate <= end && a.Complete == true
                           select new
                           {
                               Id = a.Id,
@@ -85,24 +86,7 @@ namespace DATN.Areas.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ThongKeTheoThang(int month)
-        {
-            var result = (from a in _context.Invoice
-                          join b in _context.AppUsers on a.AppUserId equals b.Id
-                          where a.IssuedDate.Value.Month == month
-                          select new
-                          {
-                              Id = a.Id,
-                              Username = b.UserName,
-                              ShippingAddress = a.ShippingAddress,
-                              Phone = a.ShippingPhone,
-                              Date = a.IssuedDate,
-                              Total = a.Total
-                          }).ToArray();
-
-            return Ok(result);
-        }
+    
 
         [HttpGet]
         public async Task<IActionResult> GetInvoiceConfirm()
@@ -160,9 +144,9 @@ namespace DATN.Areas.API.Controllers
 
         [HttpPost]
 
-        public async Task<IActionResult> Create(string id, string Address, string Phone)
+        public async Task<IActionResult> Create(string id, string Address, string Phone,string? Note)
         {
-            
+
 
             var cart = _context.Cart.Where(c => c.AppUserId == id && c.Status == false).ToList();
             var total = 0;
@@ -179,6 +163,10 @@ namespace DATN.Areas.API.Controllers
                 iv.ShippingAddress = Address;
                 iv.ShippingPhone = Phone;
                 iv.Total = total;
+                if(Note!=null&&Note!="")
+                {
+                    iv.Note = Note;
+                }
                 iv.Status = false;
                 iv.Complete = false;
                 _context.Add(iv);
@@ -201,7 +189,7 @@ namespace DATN.Areas.API.Controllers
                     ivd.InvoiceId = iv.Id;
                     ivd.ProductId = c.ProductId;
                     ivd.Quantity = c.Quantity;
-                    
+
                     ivd.UnitPrice = UnitPrice(c.ProductId) * c.Quantity;
                     ivd.Status = true;
                     _context.Add(ivd);
@@ -232,7 +220,7 @@ namespace DATN.Areas.API.Controllers
         public int UnitPrice(int id)
         {
             var pr = _context.Product.Find(id);
-            if(pr.SalePrice!=0)
+            if (pr.SalePrice != 0)
             {
                 return pr.SalePrice;
             }
@@ -278,7 +266,7 @@ namespace DATN.Areas.API.Controllers
             return NoContent();
         }
 
-       
+
 
 
         [HttpPost]
@@ -320,41 +308,48 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<ActionResult> ThongKe(DateTime start, DateTime end)
         {
-            var inv = (from a in _context.Invoice
-                          join b in _context.AppUsers on a.AppUserId equals b.Id
-                          where a.IssuedDate>=start && a.IssuedDate<=end
-                          select new
-                          {
-                              Id = a.Id,
-                              Username = b.UserName,
-                              ShippingAddress = a.ShippingAddress,
-                              Phone = a.ShippingPhone,
-                              Date = a.IssuedDate,
-                              Total = a.Total,
-                              Status = a.Status,
-                              Complete = a.Complete,
-                          }).ToArray();
+            if (start.Day == end.Day && start.Month == end.Month)
+            {
+                start = start.AddDays(-1);
+            }
+            {
 
-            var slNhap= (from a in _context.ImportecInvoiceDetail
-                         join b in _context.importedInvoice on a.ImportedInvoiceId equals b.Id
-                         where b.DateImport>=start && b.DateImport<=end
-                         select a.Quantity).Sum();
-            var slBan = (from a in _context.invoiceDetail
-                          join b in _context.Invoice on a.InvoiceId equals b.Id
-                          where b.IssuedDate >= start && b.IssuedDate <= end.AddDays(1)
+            }
+            var inv = (from a in _context.Invoice
+                       join b in _context.AppUsers on a.AppUserId equals b.Id
+                       where a.IssuedDate >= start && a.IssuedDate <= end && a.Status == true && a.Complete == true
+                       select new
+                       {
+                           Id = a.Id,
+                           Username = b.UserName,
+                           ShippingAddress = a.ShippingAddress,
+                           Phone = a.ShippingPhone,
+                           Date = a.IssuedDate,
+                           Total = a.Total,
+                           Status = a.Status,
+                           Complete = a.Complete,
+                       }).ToArray();
+
+            var slNhap = (from a in _context.ImportecInvoiceDetail
+                          join b in _context.importedInvoice on a.ImportedInvoiceId equals b.Id
+                          where b.DateImport >= start && b.DateImport <= end
                           select a.Quantity).Sum();
-            var result = _context.Invoice.Where(i => i.IssuedDate >= start && i.IssuedDate < end&&i.Complete==true).Sum(i => i.Total);
+            var slBan = (from a in _context.invoiceDetail
+                         join b in _context.Invoice on a.InvoiceId equals b.Id
+                         where b.IssuedDate >= start && b.IssuedDate <= end.AddDays(1)
+                         select a.Quantity).Sum();
+            var result = _context.Invoice.Where(i => i.IssuedDate >= start && i.IssuedDate < end && i.Complete == true).Sum(i => i.Total);
 
             var imp = _context.importedInvoice.Where(i => i.DateImport >= start && i.DateImport < end).Sum(i => i.Total);
 
-            
+
 
             return Ok(new
             {
-                inv=inv,
-                importTotal=imp,
-                saleTotal=result,
-                importQuantily=slNhap,
+                inv = inv,
+                importTotal = imp,
+                saleTotal = result,
+                importQuantily = slNhap,
                 saleQuantily = slBan
 
             });
@@ -364,15 +359,95 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<ActionResult> ThongKeTheoTuan(DateTime start)
         {
-            var result = _context.Invoice.Where(i => i.IssuedDate >= start ).Sum(i => i.Total);
+            var inv = (from a in _context.Invoice
+                       join b in _context.AppUsers on a.AppUserId equals b.Id
+                       where a.IssuedDate >= start.AddDays(-7) && a.IssuedDate <= start && a.Status == true && a.Complete == true
+                       select new
+                       {
+                           Id = a.Id,
+                           Username = b.UserName,
+                           ShippingAddress = a.ShippingAddress,
+                           Phone = a.ShippingPhone,
+                           Date = a.IssuedDate,
+                           Total = a.Total,
+                           Status = a.Status,
+                           Complete = a.Complete,
+                       }).ToArray();
+
+            var slNhap = (from a in _context.ImportecInvoiceDetail
+                          join b in _context.importedInvoice on a.ImportedInvoiceId equals b.Id
+                          where b.DateImport >= start.AddDays(-7) && b.DateImport <= start
+                          select a.Quantity).Sum();
+            var slBan = (from a in _context.invoiceDetail
+                         join b in _context.Invoice on a.InvoiceId equals b.Id
+                         where b.IssuedDate >= start.AddDays(-7) && b.IssuedDate <= start
+                         select a.Quantity).Sum();
+            var result = _context.Invoice.Where(i => i.IssuedDate >= start && i.IssuedDate < start && i.Complete == true).Sum(i => i.Total);
 
             var imp = _context.importedInvoice.Where(i => i.DateImport >= start && i.DateImport < start).Sum(i => i.Total);
 
-            return Ok(result - imp);
+
+
+            return Ok(new
+            {
+                inv = inv,
+                importTotal = imp,
+                saleTotal = result,
+                importQuantily = slNhap,
+                saleQuantily = slBan
+
+            });
+
+
+
+
         }
+        [HttpGet]
+
+        public async Task<ActionResult> ThongKeTheoThang(int month)
+        {
+            var inv = (from a in _context.Invoice
+                       join b in _context.AppUsers on a.AppUserId equals b.Id
+                       where a.IssuedDate.Value.Month ==month && a.Status == true && a.Complete == true
+                       select new
+                       {
+                           Id = a.Id,
+                           Username = b.UserName,
+                           ShippingAddress = a.ShippingAddress,
+                           Phone = a.ShippingPhone,
+                           Date = a.IssuedDate,
+                           Total = a.Total,
+                           Status = a.Status,
+                           Complete = a.Complete,
+                       }).ToArray();
+
+            var slNhap = (from a in _context.ImportecInvoiceDetail
+                          join b in _context.importedInvoice on a.ImportedInvoiceId equals b.Id
+                          where b.DateImport.Month ==month
+                          select a.Quantity).Sum();
+            var slBan = (from a in _context.invoiceDetail
+                         join b in _context.Invoice on a.InvoiceId equals b.Id
+                         where b.IssuedDate.Value.Month==month
+                         select a.Quantity).Sum();
+            var result = _context.Invoice.Where(i => i.IssuedDate.Value.Month==month && i.Complete == true).Sum(i => i.Total);
+
+            var imp = _context.importedInvoice.Where(i => i.DateImport.Month==month).Sum(i => i.Total);
 
 
-        
-       
+
+            return Ok(new
+            {
+                inv = inv,
+                importTotal = imp,
+                saleTotal = result,
+                importQuantily = slNhap,
+                saleQuantily = slBan
+
+            });
+
+
+
+
+        }
     }
 }

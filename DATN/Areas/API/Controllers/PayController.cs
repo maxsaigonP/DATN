@@ -1,4 +1,5 @@
-﻿using DATN.Models;
+﻿using DATN.Data;
+using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Common;
@@ -11,13 +12,99 @@ namespace DATN.Areas.API.Controllers
     public class PayController : ControllerBase
     {
 
-      
+        private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        [HttpPost]
-        public IActionResult Pay(int total)
+        public PayController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
+
+            _context = context;
+            _webHostEnvironment = webHostEnvironment;
+        }
+
+        [HttpGet]
+        public int UnitPrice(int id)
+        {
+            var pr = _context.Product.Find(id);
+            if (pr.SalePrice != 0)
+            {
+                return pr.SalePrice;
+            }
+            return pr.Price;
+        }
+        [HttpPost]
+        public async Task<IActionResult> Pay(int total,string id, string Address, string? Phone, string? Note)
+        {
+          
+
+            //
+            var cart = _context.Cart.Where(c => c.AppUserId == id && c.Status == false).ToList();
+            var total1 = 0;
+
+            if (cart != null)
+            {
+                foreach (var c in cart)
+                {
+                    total1 = total1 + (UnitPrice(c.ProductId) * c.Quantity);
+                }
+                var iv = new Invoice();
+                iv.AppUserId = id;
+                iv.IssuedDate = DateTime.Now.Date;
+                iv.ShippingAddress = Address;
+                iv.ShippingPhone = Phone;
+                iv.Total = total1;
+                if (Note != null && Note != "")
+                {
+                    iv.Note = Note;
+                }
+                iv.Status = true;
+                iv.Complete = false;
+                _context.Add(iv);
+                await _context.SaveChangesAsync();
+
+                foreach (var c in cart)
+                {
+                    var pro = await _context.Product.FindAsync(c.ProductId);
+                    if (pro.Quantily < c.Quantity)
+                    {
+                        return Ok(new
+                        {
+                            status = 500,
+                            msg = "Số lượn sản phẩm không đủ"
+                        });
+                    }
+                    pro.Quantily -= c.Quantity;
+                    _context.Update(pro);
+                    var ivd = new InvoiceDetail();
+                    ivd.InvoiceId = iv.Id;
+                    ivd.ProductId = c.ProductId;
+                    ivd.Quantity = c.Quantity;
+
+                    ivd.UnitPrice = UnitPrice(c.ProductId) * c.Quantity;
+                    ivd.Status = true;
+                    _context.Add(ivd);
+
+                    _context.Cart.Remove(c);
+                    await _context.SaveChangesAsync();
+                }
+                try
+                {
+                   
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }else
+            {
+                return BadRequest();
+            }
+       
+            //
             //Get Config Info
-            string vnp_Returnurl = "https://localhost:7043/api/pay/getres"; //URL nhan ket qua tra ve 
+            string vnp_Returnurl = "http://localhost:4200/cart"; //URL nhan ket qua tra ve 
             string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; //URL thanh toan cua VNPAY 
             string vnp_TmnCode = "M5R7JGFX"; //Ma website
             string vnp_HashSecret = "THSOQMPPOBWGCLPLDANVSTTMDXZVBOQG"; //Chuoi bi mat
@@ -87,6 +174,7 @@ namespace DATN.Areas.API.Controllers
         public IActionResult GetRes(int i)
         {
             string a = Request.QueryString.ToString();
+            
             return Ok(a);
         }
     }

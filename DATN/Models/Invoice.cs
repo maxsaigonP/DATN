@@ -22,6 +22,7 @@ namespace DATN.Models
         [DisplayName("Số điện thoại")]
 
         public string ShippingPhone { get; set; }
+        public string? Note { get; set; }
 
         [DisplayName("Tổng hoá đơn (VNĐ)")]
         [DisplayFormat(DataFormatString = "{0:#,##0} VNĐ")]

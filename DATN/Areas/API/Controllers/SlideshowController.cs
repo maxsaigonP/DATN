@@ -31,7 +31,7 @@ namespace DATN.Areas.API.Controllers
                          {
                              Id=a.Id,
                              Title=a.Title,
-                             Content=a.Content,
+                             Link=a.Link,
                              Image=a.Image
                          }).ToList();  
             

@@ -121,8 +121,12 @@ namespace DATN.Areas.API.Controllers
             var pro = await _context.Product.Where(p => p.CategoryId == id).ToListAsync();
             if(pro.Count>0)
             {
-                return BadRequest("Không thể xoá");
-            }else
+                return Ok(new
+                {
+                    status = 500
+                });
+            }
+            else
             {
                 var category = await _context.Category.FindAsync(id);
                 if (category != null)

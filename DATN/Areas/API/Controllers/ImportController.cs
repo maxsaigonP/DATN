@@ -137,6 +137,26 @@ namespace DATN.Areas.API.Controllers
 
         }
 
+        [HttpPost]
+
+        public async Task<IActionResult> RemoveImportItem(int id)
+        {
+            var imp = await _context.ImportItems.FindAsync(id);
+            if(imp!=null)
+            {
+                _context.Remove(imp);
+            }
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                status = 200,
+                msg = "Thêm thành công"
+            });
+
+
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetImportItem()
         {
@@ -156,28 +176,7 @@ namespace DATN.Areas.API.Controllers
         }
 
 
-        [HttpPost]
-
-        public async Task<IActionResult> RemoveImportItem(int id)
-        {
-            var imp = await _context.ImportItems.FindAsync(id);
-            if(imp!=null)
-            {
-                _context.ImportItems.Remove(imp);   
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    status = 200,
-                    msg = "Xoá thành công"
-                });
-            }
-            return BadRequest();
-        
-
-
-
-        }
+      
 
 
         //[HttpPost]
