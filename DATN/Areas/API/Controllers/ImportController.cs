@@ -65,7 +65,7 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<IActionResult> PostImport()
         {
-            var total = 0;
+            double total = 0;
             var item = await _context.ImportItems.ToListAsync();
             if(item.Count==0)
             {
@@ -91,7 +91,7 @@ namespace DATN.Areas.API.Controllers
                     await _context.SaveChangesAsync();
                     return BadRequest();
                 }
-                pro.Quantily += i.Quantity;
+                pro.Stock += i.Quantity;
                 pro.ImportPrice = i.Price;
                 _context.Update(pro);
                 var impd=new ImportecInvoiceDetail();
@@ -171,36 +171,48 @@ namespace DATN.Areas.API.Controllers
                            Gia=a.Price,
                            SoLuong=a.Quantity
                        }).ToList();
-
-            return Ok(imp);
+            double total = 0;
+            foreach (var item in imp)
+            {
+                total += item.Gia * item.SoLuong;
+            }
+            return Ok(new
+            {
+                imp1 = imp,
+                total=total
+            });
         }
 
 
-      
-
-
-        //[HttpPost]
-
-        //public async Task<IActionResult> RemoveImportInvoice(int id)
-        //{
-        //    var imp = await _context.importedInvoice.FindAsync(id);
-        //    if (imp != null)
-        //    {
-        //        _context.importedInvoice.Remove(imp);
-        //        await _context.SaveChangesAsync();
-
-        //        var impd = await _context.ImportecInvoiceDetail.Where(i => i.ImportedInvoiceId == id).ToListAsync();
-        //        return Ok(new
-        //        {
-        //            status = 200,
-        //            msg = "Xoá thành công"
-        //        });
-        //    }
-        //    return BadRequest();
 
 
 
+        [HttpPost]
 
-        //}
+        public async Task<IActionResult> Clear()
+        {
+            var imp = await _context.ImportItems.ToListAsync();
+            if (imp.Count>0)
+            {
+                try
+                {
+                    foreach (var i in imp)
+                    {
+                        _context.Remove(i);
+                        await _context.SaveChangesAsync();
+                    }
+                    return Ok(200);
+                }catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+             
+            }
+            return BadRequest();
+
+
+
+
+        }
     }
 }

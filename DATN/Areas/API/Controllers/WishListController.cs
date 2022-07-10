@@ -32,13 +32,21 @@ namespace DATN.Areas.API.Controllers
                 {
                     _context.WishList.Remove(wishl);
                    await _context.SaveChangesAsync();
-                    return Ok("Đã xoá khỏi yêu thích");
+                    return Ok(new
+                    {
+                        Status=200,
+                        msg= "Đã xoá khỏi yêu thích"
+                    });
                 }
                 else
                 {
                     _context.WishList.Add(wish);
                     await _context.SaveChangesAsync();
-                    return Ok("Da them vao yêu thích");
+                    return Ok(new
+                    {
+                        Status = 200,
+                        msg = "Đã thêm vào yêu thích"
+                    });
                 }
             
 

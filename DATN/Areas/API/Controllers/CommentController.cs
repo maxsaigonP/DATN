@@ -57,7 +57,7 @@ namespace DATN.Areas.API.Controllers
                               DanhGia = a.Star,
                               ThoiGian = a.Time,
                               TenNguoiDung=c.FullName,
-                              Avatar=c.Avatar,
+                    
                               RepId=a.ReplyId
                           }).ToList();
             return Ok(result);
@@ -68,6 +68,9 @@ namespace DATN.Areas.API.Controllers
         public async Task<IActionResult> AddComment(string userID, string content, int star, int productID,int replyID)
         {
             var comment = await _context.Comment.Where(c => c.AppUserId == userID && c.ProductId == productID&&c.ReplyId==0).FirstOrDefaultAsync();
+
+            if(replyID<=0)
+            {
 
             
             if(comment!=null)
@@ -91,6 +94,7 @@ namespace DATN.Areas.API.Controllers
                 });
 
 
+            }
             }
 
             var cmt = new Comment();
@@ -142,16 +146,60 @@ namespace DATN.Areas.API.Controllers
                 await _context.SaveChangesAsync();
 
                 var productID = cmt.ProductId;
-                var rate = await _context.Comment.Where(c => c.ProductId == productID).ToListAsync();
+                var rate = await _context.Comment.Where(c => c.ProductId == productID&&c.ReplyId==0).ToListAsync();
                 var avgStar = rate.Average(c => c.Star);
 
                 var pro = await _context.Product.FindAsync(productID);
-                pro.Star = avgStar;
+                pro.Star = Math.Round(avgStar, 1);
                 _context.Product.Update(pro);
                 await _context.SaveChangesAsync();
-                return Ok("Đã xoá bình luận");
+                return Ok(
+                    new
+                    {
+                        status=200
+                    });
             }
             
+
+            return BadRequest();
+        }
+        [HttpPost]
+
+        public async Task<IActionResult> RemoveCommentUser(int commentID,string userID)
+        {
+            var cmt = await _context.Comment.FindAsync(commentID);
+
+            if (cmt != null&&cmt.AppUserId==userID)
+            {
+                var subCmt = await _context.Comment.Where(c => c.ReplyId == commentID && c.ProductId == cmt.ProductId).ToListAsync();
+                if (subCmt.Count > 0)
+                {
+                    foreach (var c in subCmt)
+                    {
+                        _context.Comment.Remove(c);
+                        _context.SaveChanges();
+                    }
+                }
+
+                _context.Comment.Remove(cmt);
+                await _context.SaveChangesAsync();
+
+                var productID = cmt.ProductId;
+                var rate = await _context.Comment.Where(c => c.ProductId == productID&&c.ReplyId==0).ToListAsync();
+                var avgStar = rate.Average(c => c.Star);
+
+                var pro = await _context.Product.FindAsync(productID);
+                pro.Star = Math.Round(avgStar, 1); ;
+                _context.Product.Update(pro);
+                await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    Status=200,
+                    msg="Đã xoá bình luận"
+
+                });
+            }
+
 
             return BadRequest();
         }

@@ -19,7 +19,7 @@ namespace DATN.Data
         public DbSet<DATN.Models.Images>? Images { get; set; }
         public DbSet<DATN.Models.Invoice>? Invoice { get; set; }
         public DbSet<DATN.Models.InvoiceDetail>? invoiceDetail { get; set; }
-        public DbSet<DATN.Models.Log>? Log { get; set; }
+    
         public DbSet<DATN.Models.TradeMark>? TradeMarks { get; set; }
         public DbSet<DATN.Models.WishList>? WishList { get; set; }
         public DbSet<DATN.Models.Supplier>? Supplier { get; set; }

@@ -30,7 +30,6 @@ namespace DATN.Areas.API.Controllers
                          select new
                          {
                              Id=a.Id,
-                             Title=a.Title,
                              Link=a.Link,
                              Image=a.Image
                          }).ToList();  

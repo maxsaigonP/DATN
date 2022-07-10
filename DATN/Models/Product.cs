@@ -26,7 +26,7 @@ namespace DATN.Models
 
         public int SalePrice { get; set; }
         [DisplayName("Số lượng")]
-        public int? Quantily { get; set; }
+        public int? Stock { get; set; }
 
         [DisplayName("Loại sản phẩm")]
         public int CategoryId { get; set; }
@@ -45,7 +45,7 @@ namespace DATN.Models
         [DisplayName("CPU")]
         public string? CPU { get; set; }
 
-
+        public DateTime? ReleaseDate { get; set; }
         [DisplayName("RAM")]
         public string? RAM { get; set; }
 

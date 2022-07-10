@@ -34,7 +34,7 @@ namespace DATN.Areas.API.Controllers
                               IdSanPham = a.ProductId,
                               SoLuong = a.Quantity,
                               GiaSanPham=b.Price,
-                              Gia =b.SalePrice==0?b.Price:b.SalePrice * a.Quantity,
+                              Gia =(b.SalePrice==0?b.Price:b.SalePrice) * a.Quantity,
                               SoLuongCart= (from c in _context.Cart
                                             where c.AppUserId == userid
                                             select c).Count()
@@ -56,7 +56,7 @@ namespace DATN.Areas.API.Controllers
             var check = await _context.Cart.Where(c => c.ProductId == sanPham&&c.AppUserId==userID).FirstOrDefaultAsync();
             var pro = await _context.Product.FindAsync(sanPham);
            
-            if (soLuong > pro.Quantily)
+            if (soLuong > pro.Stock)
             {
                 return Ok(new
                 {
@@ -98,9 +98,17 @@ namespace DATN.Areas.API.Controllers
             var proid = cart.ProductId;
             var pro = await _context.Product.FindAsync(proid);
             cart.Quantity+=sl;
-            if(cart.Quantity>pro.Quantily)
+            if(cart.Quantity==0||cart.Quantity>5)
             {
-                return BadRequest("Số lượng sản phẩm không đủ");
+                return BadRequest();
+            }
+            if(cart.Quantity>pro.Stock)
+            {
+                return Ok(new
+                {
+                    Status = 500,
+                    msg = "Số lượng sản phẩm không đủ"
+                });
             }
             if(cart.Quantity<=0)
             {
@@ -125,7 +133,11 @@ namespace DATN.Areas.API.Controllers
             {
                 _context.Cart.Remove(cart);
                 await _context.SaveChangesAsync();
-                return Ok("Da xoa khoi gio hang");
+                return Ok(new
+                {
+                    Status=200,
+                    msg="Đã xoá khỏi giỏ hàng"
+                });
             }
            
             

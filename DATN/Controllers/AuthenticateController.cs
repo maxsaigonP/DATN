@@ -43,7 +43,7 @@ namespace DATN.Controllers
                         select new
                         {
                             Id=a.Id,
-                            Avatar=a.Avatar,
+
                             Username=a.UserName,
                             Email=a.Email,
                             Phone=a.PhoneNumber,
@@ -61,6 +61,33 @@ namespace DATN.Controllers
          
         }
 
+        [Route("searchAccount")]
+
+        public async Task<IActionResult> searchAccount(string txt)
+        {
+
+            var result = (from a in _context.AppUsers
+                          where a.UserName.Contains(txt)
+                          select new
+                          {
+                              Id = a.Id,
+
+                              Username = a.UserName,
+                              Email = a.Email,
+                              Phone = a.PhoneNumber,
+                              Address = a.ShippingAddress,
+                              AccoutType = a.AccoutType,
+                              IsLocked = a.IsLocked,
+                          }).ToList();
+            var acc = await _context.AppUsers.ToListAsync();
+
+            return Ok(new
+            {
+                acc = result,
+                count = acc.Count()
+            });
+
+        }
         [HttpGet]
         [Route("getAccountById")]
 
@@ -73,7 +100,6 @@ namespace DATN.Controllers
                           {
                               Id = a.Id,
                               FullName=a.FullName,
-                              Avatar = a.Avatar,
                               Username = a.UserName,
                               Email = a.Email,
                               Phone = a.PhoneNumber,
@@ -126,21 +152,34 @@ namespace DATN.Controllers
             var user= await  userManager.FindByIdAsync(model.Id);
             if(user!=null)
             {
-                var result= await userManager.ChangePasswordAsync(user, user.PasswordHash,model.Password);
+                
+
+                if(model.Password!="")
+                {
+                    var token = await userManager.GeneratePasswordResetTokenAsync(user);
+                    var result = await userManager.ResetPasswordAsync(user, token, model.Password);
+                    if (!result.Succeeded)
+                    {
+                        return Ok(new
+                        {
+                            status = 500,
+                            msg = "Cập nhật tài khoản thất bại"
+                        });
+                    }
+                }
+                
                 user.Email=model.Email;
                 user.PhoneNumber = model.Phone;
                 user.ShippingAddress = model.Address;
                 _context.Update(user);
                 _context.SaveChanges();
-                if(result.Succeeded)
+              
+                return Ok(new
                 {
-                    return Ok(new
-                    {
-                        status = 200,
-                        msg = "Đã cập nhật thông tin tài khoản"
-                    }) ;
-                }
-            
+                    status = 200,
+                    msg = "Đã cập nhật thông tin tài khoản"
+                });
+
             }
             return Ok(new
             {
@@ -210,7 +249,7 @@ namespace DATN.Controllers
 
                 });
             }
-            return Unauthorized(new
+            return Ok(new
             {
                 status=400
             });
@@ -238,7 +277,7 @@ namespace DATN.Controllers
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
                 PhoneNumber=model.Phone,
-                Avatar=model.Avatar,
+
                 AccoutType="User",
                 FullName=model.FullName,
                 ShippingAddress=model.ShippingAddress,

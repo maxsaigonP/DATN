@@ -33,76 +33,8 @@ namespace DATN.Areas.API.Controllers
             return pr.Price;
         }
         [HttpPost]
-        public async Task<IActionResult> Pay(int total,string id, string Address, string? Phone, string? Note)
+        public async Task<IActionResult> Pay(double total)
         {
-          
-
-            //
-            var cart = _context.Cart.Where(c => c.AppUserId == id && c.Status == false).ToList();
-            var total1 = 0;
-
-            if (cart != null)
-            {
-                foreach (var c in cart)
-                {
-                    total1 = total1 + (UnitPrice(c.ProductId) * c.Quantity);
-                }
-                var iv = new Invoice();
-                iv.AppUserId = id;
-                iv.IssuedDate = DateTime.Now.Date;
-                iv.ShippingAddress = Address;
-                iv.ShippingPhone = Phone;
-                iv.Total = total1;
-                if (Note != null && Note != "")
-                {
-                    iv.Note = Note;
-                }
-                iv.Status = true;
-                iv.Complete = false;
-                _context.Add(iv);
-                await _context.SaveChangesAsync();
-
-                foreach (var c in cart)
-                {
-                    var pro = await _context.Product.FindAsync(c.ProductId);
-                    if (pro.Quantily < c.Quantity)
-                    {
-                        return Ok(new
-                        {
-                            status = 500,
-                            msg = "Số lượn sản phẩm không đủ"
-                        });
-                    }
-                    pro.Quantily -= c.Quantity;
-                    _context.Update(pro);
-                    var ivd = new InvoiceDetail();
-                    ivd.InvoiceId = iv.Id;
-                    ivd.ProductId = c.ProductId;
-                    ivd.Quantity = c.Quantity;
-
-                    ivd.UnitPrice = UnitPrice(c.ProductId) * c.Quantity;
-                    ivd.Status = true;
-                    _context.Add(ivd);
-
-                    _context.Cart.Remove(c);
-                    await _context.SaveChangesAsync();
-                }
-                try
-                {
-                   
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-
-            }else
-            {
-                return BadRequest();
-            }
-       
-            //
             //Get Config Info
             string vnp_Returnurl = "http://localhost:4200/cart"; //URL nhan ket qua tra ve 
             string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; //URL thanh toan cua VNPAY 
@@ -113,7 +45,7 @@ namespace DATN.Areas.API.Controllers
             OrderInfo order = new OrderInfo();
             //Save order to db
             order.OrderId = DateTime.Now.Ticks; ; // Giả lập mã giao dịch hệ thống merchant gửi sang VNPAY
-            order.Amount = 20000000; // Giả lập số tiền thanh toán hệ thống merchant gửi sang VNPAY 100,000 VND
+            order.Amount = total; // Giả lập số tiền thanh toán hệ thống merchant gửi sang VNPAY 100,000 VND
             order.Status = "0"; //0: Trạng thái thanh toán "chờ thanh toán" hoặc "Pending"
             order.OrderDesc = "";
             order.CreatedDate = DateTime.Now;
@@ -124,7 +56,7 @@ namespace DATN.Areas.API.Controllers
             vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-            vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString()); //Số tiền thanh toán. Số tiền không mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND (một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần (khử phần thập phân), sau đó gửi sang VNPAY là: 10000000
+            vnpay.AddRequestData("vnp_Amount", (order.Amount).ToString()); //Số tiền thanh toán. Số tiền không mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND (một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần (khử phần thập phân), sau đó gửi sang VNPAY là: 10000000
 
             vnpay.AddRequestData("vnp_BankCode", "NCB");
 

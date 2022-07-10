@@ -32,51 +32,7 @@ namespace DATN.Areas.API.Controllers
         public async Task<ActionResult> Show()
         {
             var result = (from a in _context.Product
-                          join b in _context.TradeMarks on a.TradeMarkId equals b.Id                  
-                          select new
-                          {
-                              Id=a.Id,
-                              Name = a.Name,
-                              Category = a.Category.Name,
-                              Price = a.Price,
-                              SalePrice=a.SalePrice,
-                              Description = a.Description,
-                              Stock = a.Quantily,
-                              TradeMark = b.Name,
-                              Star = a.Star,
-                              Image = a.Image,
-                              HardDisk=a.HardDisk,
-                              Port=a.Port,
-                              Os=a.OS,
-                              ReleaseTime=a.ReleaseTime,
-                          }).ToArray();
-
-            return Ok(new
-            {
-                pro=result,
-                count=result.Count()
-            });
-        }
-        //
-        [HttpGet]
-        public async Task<ActionResult> TopSell()
-        {
-            var result =
-                (from item in _context.invoiceDetail
-                 group item.Quantity by item.ProductId into g
-                 orderby g.Sum() descending
-                 select g.Key).Take(5);
-                        return Ok(result);
-        }
-
-
-
-        //
-        [HttpGet]
-        public async Task<ActionResult> ShowNews()
-        {
-            var result = (from a in _context.Product
-                          orderby a.Id descending
+                          join b in _context.TradeMarks on a.TradeMarkId equals b.Id
                           select new
                           {
                               Id = a.Id,
@@ -85,7 +41,128 @@ namespace DATN.Areas.API.Controllers
                               Price = a.Price,
                               SalePrice = a.SalePrice,
                               Description = a.Description,
-                              Stock = a.Quantily,
+                              Stock = a.Stock,
+                              TradeMark = b.Name,
+                              Star = a.Star,
+                              Image = a.Image,
+                              HardDisk = a.HardDisk,
+                              Port = a.Port,
+                              Os = a.OS,
+                              ReleaseTime = a.ReleaseTime,
+                          }).ToArray();
+
+            return Ok(new
+            {
+                pro = result,
+                count = result.Count()
+            });
+        }
+        //
+
+        [HttpGet]
+        public async Task<ActionResult> GetSale()
+        {
+            var result = (from a in _context.Product
+                          join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                          where a.SalePrice > 0
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              Category = a.Category.Name,
+                              Price = a.Price,
+                              SalePrice = a.SalePrice,
+                              Description = a.Description,
+                              Stock = a.Stock,
+                              TradeMark = b.Name,
+                              Star = a.Star,
+                              Image = a.Image,
+                              HardDisk = a.HardDisk,
+                              Port = a.Port,
+                              Os = a.OS,
+                              ReleaseTime = a.ReleaseTime,
+                          }).ToArray();
+
+            return Ok(new
+            {
+                pro = result,
+                count = result.Count()
+            });
+        }
+        //
+        [HttpGet]
+        public async Task<ActionResult> TopSell()
+        {
+            var query = (from a in _context.Product
+                         join c in _context.TradeMarks on a.TradeMarkId equals c.Id
+                         join d in _context.Category on a.CategoryId equals d.Id
+                         let sum = (from b in _context.invoiceDetail
+                                    join hd in _context.Invoice on b.InvoiceId equals hd.Id
+                                    where b.ProductId == a.Id
+                                    select b.Quantity
+                                       ).Sum()
+                         where sum > 0
+                         orderby sum descending
+                         select new
+                         {
+                             Id = a.Id,
+                             Name = a.Name,
+                             Category = a.Category.Name,
+                             Price = a.Price,
+                             SalePrice = a.SalePrice,
+                             Description = a.Description,
+                             Stock = a.Stock,
+                             TradeMark = d.Name,
+                             Star = a.Star,
+                             Image = a.Image,
+                             HardDisk = a.HardDisk,
+                             Port = a.Port,
+                             Os = a.OS,
+                             ReleaseTime = a.ReleaseTime,
+                             SoLuongBan = sum
+
+
+                         }
+                         ).Take(5);
+            return Ok(query);
+
+
+        }
+
+        [HttpGet]
+
+        public async Task<IActionResult> GetDash()
+        {
+            var pMotnhI = await _context.importedInvoice.Where(i => i.DateImport.Month == DateTime.Now.Month - 1).ToListAsync();
+            var pMotnh = await _context.Invoice.Where(i => i.IssuedDate.Value.Month == DateTime.Now.Month-1&&i.Complete==true).ToListAsync();
+            var cMotnhI = await _context.importedInvoice.Where(i => i.DateImport.Month == DateTime.Now.Month).ToListAsync();
+            var cMotnh = await _context.Invoice.Where(i => i.IssuedDate.Value.Month == DateTime.Now.Month&&i.Complete==true).ToListAsync();
+            var p = pMotnh.Sum(i => i.Total);
+            var c = cMotnh.Sum(i => i.Total);
+            var pI=pMotnhI.Sum(i => i.Total);
+            var cI=cMotnhI.Sum(i => i.Total);
+            return Ok(new
+            {
+                pMonth = p-pI,
+                cMonth=c-cI
+            });
+        }
+
+        //
+        [HttpGet]
+        public async Task<ActionResult> ShowNews()
+        {
+            var result = (from a in _context.Product
+                          where a.ReleaseDate.Value.Day>=DateTime.Now.Day-7
+                          select new
+                          {
+                              Id = a.Id,
+                              Name = a.Name,
+                              Category = a.Category.Name,
+                              Price = a.Price,
+                              SalePrice = a.SalePrice,
+                              Description = a.Description,
+                              Stock = a.Stock,
                               TradeMark = a.TradeMark,
                               Star = a.Star,
                               Image = a.Image
@@ -105,7 +182,7 @@ namespace DATN.Areas.API.Controllers
                               Price = a.Price,
                               SalePrice = a.SalePrice,
                               Description = a.Description,
-                              Stock = a.Quantily,
+                              Stock = a.Stock,
                               TradeMark = a.TradeMark,
                               Star = a.Star,
                               Image = a.Image
@@ -130,7 +207,7 @@ namespace DATN.Areas.API.Controllers
                              Price= a.Price,
                              SalePrice = a.SalePrice,
                              Description =a.Description,
-                             Stock=a.Quantily,
+                             Stock=a.Stock,
                              TradeMark=b.Name,
                              TradeMarkId=b.Id,
                              Star=a.Star,
@@ -145,6 +222,9 @@ namespace DATN.Areas.API.Controllers
                              Port=a.Port,
                              OS=a.OS,
                              ReleaseTime=a.ReleaseTime,
+                             Comment= (from d in _context.Comment
+                                       where d.ProductId==a.Id && d.ReplyId==0
+                                       select d.ProductId).Count()
 
                          }).FirstOrDefault();
             var img= (from a in _context.Images
@@ -190,7 +270,7 @@ namespace DATN.Areas.API.Controllers
                               Price = a.Price,
                               SalePrice=a.SalePrice,
                               Description = a.Description,
-                              Stock = a.Quantily,
+                              Stock = a.Stock,
                               TradeMark = a.TradeMark,
                               Star = a.Star,
                               Image = a.Image
@@ -213,10 +293,12 @@ namespace DATN.Areas.API.Controllers
                               Category = a.CategoryId,
                               Price = a.Price,
                               Description = a.Description,
-                              Stock = a.Quantily,
+                              Stock = a.Stock,
                               TradeMark = a.TradeMark,
                               Star = a.Star,
-                              Image = a.Image
+                              Image = a.Image,
+                              SalePrice=a.SalePrice,
+                              CategoryName=a.Category.Name
                           }).ToList();
             return Ok(new
             {
@@ -237,10 +319,11 @@ namespace DATN.Areas.API.Controllers
                               Category = a.CategoryId,
                               Price = a.Price,
                               Description = a.Description,
-                              Stock = a.Quantily,
+                              Stock = a.Stock,
                               TradeMark = a.TradeMark,
                               Star = a.Star,
-                              Image = a.Image
+                              Image = a.Image,
+                              SalePrice = a.SalePrice
                           }).ToList();
 
             return Ok(new
@@ -359,7 +442,7 @@ namespace DATN.Areas.API.Controllers
                     Description = product.Description,
                     Price = product.Price,
                     TradeMarkId = product.TradeMarkId,
-                    Quantily = product.Quantily,
+                    Stock = product.Quantily,
                     Star = product.Star,
                     CPU = product.CPU,
                     RAM = product.RAM,
@@ -374,6 +457,7 @@ namespace DATN.Areas.API.Controllers
                     Port=product.Port,
                     ReleaseTime=product.ReleaseTime,
                     SalePrice=0,
+                    ReleaseDate=DateTime.Now,
                     
 
                 };
@@ -735,6 +819,113 @@ namespace DATN.Areas.API.Controllers
             }catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> ResetPromotion(int? proId,int? cateId, int? brandId)
+        {
+            if(proId==0)
+            {
+                if(cateId==0)
+                {
+                    if(brandId==0)
+                    {
+                        var lst = await _context.Product.Where(p => p.SalePrice > 0).ToListAsync();
+                        if(lst.Count>0)
+                        {
+                            try
+                            {
+                                foreach(var item in lst)
+                                {
+                                  item.SalePrice = 0;
+                                    _context.Update(item);
+                                    await _context.SaveChangesAsync();
+                                }
+                                return Ok(new
+                                {
+                                    status = 200,
+                                    msg = "Đã đặt lại giá"
+                                });
+                            }catch(Exception ex)
+                            {
+                                BadRequest(ex.Message);
+                            }
+                        }
+                    }else
+                    {
+                        var lst = await _context.Product.Where(p => p.TradeMarkId==brandId).ToListAsync();
+                        if (lst.Count > 0)
+                        {
+                            try
+                            {
+                                foreach (var item in lst)
+                                {
+                                    item.SalePrice = 0;
+                                    _context.Update(item);
+                                    await _context.SaveChangesAsync();
+                                    return Ok(new
+                                    {
+                                        status = 200,
+                                        msg = "Đã đặt lại giá"
+                                    });
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                BadRequest(ex.Message);
+                            }
+                        }
+                    }
+                }else
+                {
+                    var lst = await _context.Product.Where(p => p.CategoryId==cateId).ToListAsync();
+                    if (lst.Count > 0)
+                    {
+                        try
+                        {
+                            foreach (var item in lst)
+                            {
+                                item.SalePrice = 0;
+                                _context.Update(item);
+                                await _context.SaveChangesAsync();
+                                return Ok(new
+                                {
+                                    status = 200,
+                                    msg = "Đã đặt lại giá"
+                                });
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            BadRequest(ex.Message);
+                        }
+                    }
+                }
+            }else
+            {
+                var pro = await _context.Product.FindAsync(proId);
+                if(pro!=null)
+                {
+                    try
+                    {
+                        pro.SalePrice = 0;
+                        _context.Update(pro);
+                        await _context.SaveChangesAsync();
+                        return Ok(new
+                        {
+                            status = 200,
+                            msg = "Đã đặt lại giá"
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        BadRequest(ex.Message);
+                    }
+                }
             }
 
             return BadRequest();

@@ -2,6 +2,7 @@
 using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace DATN.Areas.API.Controllers
 {
@@ -11,7 +12,7 @@ namespace DATN.Areas.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
+       
         public SupplierController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
 
@@ -46,6 +47,7 @@ namespace DATN.Areas.API.Controllers
         {
             if(ModelState.IsValid)
             {
+                sup.Image = "";
                 _context.Supplier.Add(sup);
                 await _context.SaveChangesAsync();
                 return Ok(new
@@ -106,5 +108,10 @@ namespace DATN.Areas.API.Controllers
             }
             return BadRequest();
         }
+
+        //
+
+       
+
     }
 }

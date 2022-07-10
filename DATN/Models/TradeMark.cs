@@ -8,7 +8,7 @@ namespace DATN.Models
 
         [DisplayName("Thương hiệu")]
         public string Name { get; set; }
-
+        public string? Image { get; set; }
         public List<Product>? Products { get; set; }
 
 

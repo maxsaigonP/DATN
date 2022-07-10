@@ -51,6 +51,8 @@ namespace DATN.Areas.API.Controllers
             return Ok(result);
         }
 
+    
+
         [HttpGet]
 
         public async Task<ActionResult> SearchCategory(string txtSearch)

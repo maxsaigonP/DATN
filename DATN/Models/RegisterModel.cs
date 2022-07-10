@@ -21,6 +21,6 @@ namespace DATN.Models
         [Required(ErrorMessage = "Location is required")]
         public string? ShippingAddress{ get; set; }
 
-        public string? Avatar { get; set; }
+       
     }
 }

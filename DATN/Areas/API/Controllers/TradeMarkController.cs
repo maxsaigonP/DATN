@@ -2,6 +2,7 @@
 using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace DATN.Areas.API.Controllers
 {
@@ -11,7 +12,7 @@ namespace DATN.Areas.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
+        public string Url = "C:\\Users\\BAO PHUC- PC\\DATN\\src\\assets\\img\\brand\\";
 
         public TradeMarkController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -29,6 +30,10 @@ namespace DATN.Areas.API.Controllers
                          {
                              Id=a.Id,
                              Name=a.Name,
+                             Image=a.Image,
+                             Count=(from c in _context.Product
+                                    where c.TradeMarkId==a.Id
+                                    select c.Id).Count()
                          }).ToList();
 
             return Ok(result);
@@ -64,7 +69,8 @@ namespace DATN.Areas.API.Controllers
                 return Ok(new
                 {
                     status=200,
-                    msg="Thêm thành công"
+                    msg="Thêm thành công",
+                    id=tradeMark.Id
                 });
             }catch (Exception ex)
             {
@@ -76,6 +82,54 @@ namespace DATN.Areas.API.Controllers
            ;    
         }
 
+
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> Upload(int id1)
+        {
+
+            try
+            {
+        
+                var formCollection = await Request.ReadFormAsync();
+                var a = 0;
+                var file = formCollection.Files.First();
+
+
+             
+                if (file.Length > 0)
+                {
+                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    var fname = id1.ToString() + "." + fileName.Split('.')[1];
+                    var path = Path.Combine(Url, fname);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
+
+
+                    var sup = await _context.TradeMarks.FindAsync(id1);
+                    if (sup != null)
+                    {
+                        sup.Image = fname;
+                        _context.Update(sup);
+                    }
+                    await _context.SaveChangesAsync();
+
+                }
+                else
+                {
+                    return BadRequest();
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+            return BadRequest();
+        }
         [HttpPut]
 
         public async Task<IActionResult> EditTradeMark(int id,TradeMark tradeMark)
@@ -122,6 +176,12 @@ namespace DATN.Areas.API.Controllers
             if(check==null)
             {
                 return BadRequest();
+            }
+            if (check.Image != null)
+            {
+                var fileDelete = Path.Combine(Url, check.Image);
+                FileInfo file = new FileInfo(fileDelete);
+                file.Delete();
             }
             _context.TradeMarks.Remove(check);
             await _context.SaveChangesAsync();

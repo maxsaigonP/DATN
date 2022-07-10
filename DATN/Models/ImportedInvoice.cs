@@ -11,8 +11,8 @@ namespace DATN.Models
         [DisplayName("Ngày nhập")]
         public DateTime DateImport { get; set; }
         [DisplayName("Tổng tiền")]
-        [DisplayFormat(DataFormatString = "{0:#,##0} VNĐ")]
-        public float Total { get; set; }
+    
+        public double Total { get; set; }
         [DisplayName("Trạng thái")]
         public int Status { get; set; }
     }

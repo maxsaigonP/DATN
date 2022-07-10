@@ -29,6 +29,7 @@ namespace DATN.Models
         public float Total { get; set; }
         [DisplayName("Trạng thái")]
 
+        public bool? Cancel { get; set; }
         public bool? Status { get; set; }
 
         [DisplayName("Hoàn thành")]
