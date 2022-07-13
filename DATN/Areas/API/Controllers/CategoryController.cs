@@ -80,14 +80,18 @@ namespace DATN.Areas.API.Controllers
                 var cate = await _context.Category.Where(p => p.Name == category.Name).ToListAsync();
                 if (cate.Count!=0)
                 {
-                    return BadRequest("Loại sản phẩm đã tồn tại");
+                    return Ok(new
+                    {
+                        status = 500,
+                        msg = "Danh mục đã tồn tại"
+                    });
                 }
               
                 category.Status = true;
                 _context.Add(category);
 
                 await _context.SaveChangesAsync();
-                return Ok("Ok"
+                return Ok(new { status = 200, msg ="Thêm thành công"}
                 );
             }
             return BadRequest(ModelState);
@@ -99,14 +103,26 @@ namespace DATN.Areas.API.Controllers
             try
             {
 
-         
+                
                 var cate = await _context.Category.FindAsync(id);
+                var cate1 = await _context.Category.Where(p => p.Name == name&&p.Name!=cate.Name).ToListAsync();
+                if (cate1.Count>0)
+                {
+                    return Ok(new
+                    {
+                        status=500,
+                        msg ="Danh mục đã tồn tại"
+                    });
+                }
                 cate.Name=name;
                 cate.Status = status;
                 _context.Update(cate);
 
                 await _context.SaveChangesAsync();
-                return Ok("Ok");
+                return Ok(new
+                {
+                    status=200,
+                });
             }
             catch(Exception e)
             {

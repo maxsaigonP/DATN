@@ -2,6 +2,7 @@
 using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 
 namespace DATN.Areas.API.Controllers
@@ -12,7 +13,7 @@ namespace DATN.Areas.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public string Url = "C:\\Users\\BAO PHUC- PC\\DATN\\src\\assets\\img\\brand\\";
+        public string Url = "D:\\Do An Tot Ngiep\\DATN\\src\\assets\\img\\brand\\";
 
         public TradeMarkController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -49,6 +50,7 @@ namespace DATN.Areas.API.Controllers
                           {
                               Id = a.Id,
                               Name = a.Name,
+                              Image=a.Image
                           }).FirstOrDefault();
 
             return Ok(result);
@@ -60,6 +62,15 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<IActionResult> PostTradeMark(string name)
         {
+            var check = await _context.TradeMarks.Where(t => t.Name.ToLower().Contains(name.ToLower())).ToListAsync();
+            if(check.Count>0)
+            {
+                return Ok(new
+                {
+                    status = 500,
+                    msg = "Tên nhãn hiệu đã tồn tại"
+                });
+            }
             var tradeMark=new TradeMark();
             tradeMark.Name = name;
             _context.TradeMarks.Add(tradeMark);
@@ -139,7 +150,7 @@ namespace DATN.Areas.API.Controllers
             {
                 return BadRequest();
             }
-            if(check.Name.Equals(tradeMark.Name))
+            if(check.Name.ToLower().Contains(tradeMark.Name.ToLower()))
             {
                 return Ok(new
                 {
@@ -168,6 +179,14 @@ namespace DATN.Areas.API.Controllers
 
             
         }
+        [HttpGet]
+
+        public async Task<IActionResult> Search(string txtSearch)
+        {
+            var result= await _context.TradeMarks.Where(t => t.Name.ToLower().Contains(txtSearch.ToLower())).ToListAsync();
+            return Ok(result);
+        }
+        
 
         [HttpPost] 
          public async Task<IActionResult> RemoveTradeMark(int id)
@@ -191,6 +210,58 @@ namespace DATN.Areas.API.Controllers
                 status = 200,
                 msg = "Xoá thành công"
             });
+        }
+
+        [HttpPost, DisableRequestSizeLimit]
+        public async Task<IActionResult> Upload1(int id)
+        {
+
+
+            try
+            {
+                var formCollection = await Request.ReadFormAsync();
+                var file = formCollection.Files.First();
+
+                if (file.Length > 0)
+                {
+                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+
+
+                    var fname = id.ToString() + "." + fileName.Split('.')[1];
+                    var pro = await _context.TradeMarks.FindAsync(id);
+
+
+                    //
+
+
+                    string Path1 = Url + pro.Image;
+                    if (pro.Image != null && pro.Image != "")
+                    {
+                        FileInfo file1 = new FileInfo(Path1);
+                        if (file1.Exists)
+                        {
+                            file1.Delete();
+                        }
+                    }
+                    var path = Path.Combine(Url, fname);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    pro.Image = fname;
+                    _context.Update(pro);
+                    await _context.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
         }
     }
 }

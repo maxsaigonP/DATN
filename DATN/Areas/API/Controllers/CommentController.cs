@@ -41,6 +41,49 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Search(string txtSearch)
+        {
+            var result = (from a in _context.Comment
+                          join b in _context.Product on a.ProductId equals b.Id
+                          join c in _context.AppUsers on a.AppUserId equals c.Id
+                          where c.UserName.Contains(txtSearch.Trim())
+                          select new
+                          {
+                              Id = a.Id,
+                              UserId = a.AppUserId,
+                              UserName = c.UserName,
+                              NoiDung = a.Content,
+                              IdSanPham = a.ProductId,
+                              TenSanPham = b.Name,
+                              DanhGia = a.Star,
+                              ThoiGian = a.Time
+                          }).ToList();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterStar(int star)
+        {
+            var result = (from a in _context.Comment
+                          join b in _context.Product on a.ProductId equals b.Id
+                          join c in _context.AppUsers on a.AppUserId equals c.Id
+                          where a.Star==star
+                          select new
+                          {
+                              Id = a.Id,
+                              UserId = a.AppUserId,
+                              UserName = c.UserName,
+                              NoiDung = a.Content,
+                              IdSanPham = a.ProductId,
+                              TenSanPham = b.Name,
+                              DanhGia = a.Star,
+                              ThoiGian = a.Time
+                          }).ToList();
+            return Ok(result);
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> GetAllCommentInProduct(int id)
         {
             var result = (from a in _context.Comment

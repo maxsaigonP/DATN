@@ -60,6 +60,34 @@ namespace DATN.Controllers
         });
          
         }
+        [HttpGet]
+        [Route("filAccount")]
+
+        public async Task<IActionResult> FilterAccount(int id)
+        {
+
+            var result = (from a in _context.AppUsers
+                          where a.AccoutType==(id==1?"Admin":"User")
+                          select new
+                          {
+                              Id = a.Id,
+
+                              Username = a.UserName,
+                              Email = a.Email,
+                              Phone = a.PhoneNumber,
+                              Address = a.ShippingAddress,
+                              AccoutType = a.AccoutType,
+                              IsLocked = a.IsLocked,
+                          }).ToList();
+            var acc = await _context.AppUsers.ToListAsync();
+
+            return Ok(new
+            {
+                acc = result,
+                count = acc.Count()
+            });
+
+        }
 
         [Route("searchAccount")]
 
@@ -67,7 +95,7 @@ namespace DATN.Controllers
         {
 
             var result = (from a in _context.AppUsers
-                          where a.UserName.Contains(txt)
+                          where a.UserName.Contains(txt) || a.Email.Contains(txt) || a.PhoneNumber.Contains(txt)
                           select new
                           {
                               Id = a.Id,
@@ -106,7 +134,10 @@ namespace DATN.Controllers
                               Address = a.ShippingAddress,
                               AccoutType = a.AccoutType,
                               IsLocked = a.IsLocked,
-                              Password=a.PasswordHash
+                              Password=a.PasswordHash,
+                              Count=(from b in _context.Invoice
+                                     where b.AppUserId==id
+                                     select b.Id).Count()
                           }).FirstOrDefault();
             return Ok(result);
         }
@@ -243,7 +274,7 @@ namespace DATN.Controllers
                     phone=user.PhoneNumber,
                     role=user.AccoutType,
                     username=user.UserName,
-
+                    name=user.FullName
 
 
 
@@ -347,7 +378,7 @@ namespace DATN.Controllers
                 string UpperCase = "QWERTYUIOPASDFGHJKLZXCVBNM";
                 string LowerCase = "qwertyuiopasdfghjklzxcvbnm";
                 string Digits = "1234567890";
-                string allCharacters = UpperCase + LowerCase + Digits;
+                string allCharacters = UpperCase+ Digits;
                 Random r = new Random();
                 String password = "";
                 //var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(password);

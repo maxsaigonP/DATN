@@ -36,6 +36,21 @@ namespace DATN.Areas.API.Controllers
 
             return Ok(imp);
         }
+        [HttpGet]
+
+        public async Task<IActionResult> Filter(DateTime start, DateTime end)
+        {
+            var imp = (from a in _context.importedInvoice
+                       where a.DateImport.Day >= start.Day&&a.DateImport.Day <= end.Day&&a.DateImport.Month>= start.Month&&a.DateImport.Month <= end.Month
+                       select new
+                       {
+                           Id = a.Id,
+                           ThoiGian = a.DateImport,
+                           Total = a.Total
+                       }).ToList();
+
+            return Ok(imp);
+        }
 
         [HttpGet]
 
@@ -49,8 +64,10 @@ namespace DATN.Areas.API.Controllers
                        select new
                        {
                            Id = a.Id,
+                           NgayNhap=d.DateImport,
                            SanPhamId=a.ProductId,
                            TenSanPham=b.Name,
+                           GiaNhap=a.Price,
                            SoLuong=a.Quantity,
                            Gia=a.Price*a.Quantity,
                            NhaCungCap=c.SupplierName,

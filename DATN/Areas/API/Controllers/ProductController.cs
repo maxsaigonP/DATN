@@ -13,7 +13,7 @@ namespace DATN.Areas.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public string Url = "C:\\Users\\BAO PHUC- PC\\DATN\\src\\assets\\img\\product\\";
+        public string Url = "D:\\Do An Tot Ngiep\\DATN\\src\\assets\\img\\product\\";
 
         public ProductController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -154,6 +154,7 @@ namespace DATN.Areas.API.Controllers
         {
             var result = (from a in _context.Product
                           where a.ReleaseDate.Value.Day>=DateTime.Now.Day-7
+                          orderby a.ReleaseDate descending
                           select new
                           {
                               Id = a.Id,
@@ -261,20 +262,26 @@ namespace DATN.Areas.API.Controllers
         public async Task<ActionResult> Search(string txtSearch)
         {
             var result = (from a in _context.Product
+                          join b in _context.TradeMarks on a.TradeMarkId equals b.Id
                           where a.Name.Contains(txtSearch)
                           select new
                           {
                               Id = a.Id,
                               Name = a.Name,
-                              Category = a.CategoryId,
+                              Category = a.Category.Name,
                               Price = a.Price,
-                              SalePrice=a.SalePrice,
+                              SalePrice = a.SalePrice,
                               Description = a.Description,
                               Stock = a.Stock,
-                              TradeMark = a.TradeMark,
+                              TradeMark = b.Name,
                               Star = a.Star,
-                              Image = a.Image
-                          }).ToList();
+                              Image = a.Image,
+                              HardDisk = a.HardDisk,
+                              Port = a.Port,
+                              Os = a.OS,
+                              ReleaseTime = a.ReleaseTime,
+                          }).ToArray();
+
             return Ok(new
             {
                 pro = result,
@@ -290,11 +297,12 @@ namespace DATN.Areas.API.Controllers
                           {
                               Id = a.Id,
                               Name = a.Name,
-                              Category = a.CategoryId,
+                              Category = a.Category.Name,
+                              CategoryId=a.CategoryId,
                               Price = a.Price,
                               Description = a.Description,
                               Stock = a.Stock,
-                              TradeMark = a.TradeMark,
+                              TradeMark = a.TradeMark.Name,
                               Star = a.Star,
                               Image = a.Image,
                               SalePrice=a.SalePrice,
@@ -316,11 +324,11 @@ namespace DATN.Areas.API.Controllers
                           {
                               Id = a.Id,
                               Name = a.Name,
-                              Category = a.CategoryId,
+                              Category = a.Category.Name,
                               Price = a.Price,
                               Description = a.Description,
                               Stock = a.Stock,
-                              TradeMark = a.TradeMark,
+                              TradeMark = a.TradeMark.Name,
                               Star = a.Star,
                               Image = a.Image,
                               SalePrice = a.SalePrice
@@ -346,11 +354,14 @@ namespace DATN.Areas.API.Controllers
                 try
                 {
                     var npro = await _context.Product.FindAsync(id);
-
+                    if(npro.Price!=product.Price)
+                    {
+                        npro.SalePrice = 0;
+                    }
                     npro.Name = product.Name;
                     npro.Description = product.Description;
                     npro.Price = product.Price;
-                    npro.TradeMark = product.TradeMark;
+                    npro.TradeMarkId = product.TradeMarkId;
                     
                     npro.Star = product.Star;
                     npro.CPU = product.CPU;
@@ -704,7 +715,51 @@ namespace DATN.Areas.API.Controllers
         {
             try
             {
+                if (sale.Brand == 0 && sale.Cate == 0&&sale.Pro==0)
+                {
+                    var product = await _context.Product.ToListAsync();
+                    if (product.Count > 0)
+                    {
+                        if (sale.Percent != 0)
+                        {
+                            foreach (var p in product)
+                            {
+                                
+                                p.SalePrice = p.Price - (p.Price / 10 * sale.Percent / 100)*10;
+                                if (p.SalePrice <= 0)
+                                {
+                                    p.SalePrice = 0;
+                                  
+                                }
+                                _context.Update(p);
+                                await _context.SaveChangesAsync();
+                            }
 
+                        }
+                        if (sale.Price != 0)
+                        {
+                            foreach (var p in product)
+                            {
+                                p.SalePrice = p.Price - sale.Price;
+                                if (p.SalePrice <= 0)
+                                {
+                                    p.SalePrice = 0;
+                                    
+                                }
+                                _context.Update(p);
+                                await _context.SaveChangesAsync();
+                            }
+
+                        }
+
+                        
+                        return Ok(new
+                        {
+                            status = 200,
+
+                        });
+                    }
+                }
 
                 if (sale.Brand == 0)
                 {
@@ -748,7 +803,7 @@ namespace DATN.Areas.API.Controllers
                             {
                                 foreach (var p in product)
                                 {
-                                    p.SalePrice = p.Price- (p.Price * sale.Percent) / 100;
+                                    p.SalePrice = p.Price - (p.Price / 10 * sale.Percent / 100) * 10;
                                     if (p.SalePrice <= 0)
                                     {
                                         p.SalePrice = 0;
@@ -789,7 +844,7 @@ namespace DATN.Areas.API.Controllers
                         {
                             foreach (var p in product)
                             {
-                                p.SalePrice = p.Price- p.Price * sale.Percent / 100;
+                                p.SalePrice = p.Price - (p.Price / 10 * sale.Percent / 100) * 10;
                                 if (p.SalePrice <= 0)
                                 {
                                     p.SalePrice = 0;
@@ -828,6 +883,21 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<IActionResult> ResetPromotion(int? proId,int? cateId, int? brandId)
         {
+            if(proId==0&& cateId==0&& brandId==0)
+            {
+                var lst = await _context.Product.ToListAsync();
+                foreach(var p in lst)
+                {
+                    p.SalePrice = 0;
+                    _context.Update(p);
+                    await _context.SaveChangesAsync();
+                }
+                return Ok(new
+                {
+                    status = 200,
+                    msg = "Đã đặt lại giá"
+                });
+            }
             if(proId==0)
             {
                 if(cateId==0)
@@ -867,12 +937,13 @@ namespace DATN.Areas.API.Controllers
                                     item.SalePrice = 0;
                                     _context.Update(item);
                                     await _context.SaveChangesAsync();
-                                    return Ok(new
-                                    {
-                                        status = 200,
-                                        msg = "Đã đặt lại giá"
-                                    });
+                                 
                                 }
+                                return Ok(new
+                                {
+                                    status = 200,
+                                    msg = "Đã đặt lại giá"
+                                });
                             }
                             catch (Exception ex)
                             {
@@ -926,6 +997,466 @@ namespace DATN.Areas.API.Controllers
                         BadRequest(ex.Message);
                     }
                 }
+            }
+
+            return BadRequest();
+        }
+
+        [HttpGet]
+
+        public async Task<IActionResult> FilterPriceCate(int id,int cate)
+        {
+          
+            if(id==1)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price<15000000 && a.CategoryId==cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 2)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 15000000 && a.Price<=20000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 3)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >=20000000&& a.Price<=25000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 4)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 25000000 && a.Price <= 30000000 && a.CategoryId == cate
+                              select new 
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 5)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price > 30000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+
+            return BadRequest();
+        }
+        [HttpGet]
+
+        public async Task<IActionResult> FilterPriceBrand(int id, int cate)
+        {
+
+            if (id == 1)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price < 15000000 && a.TradeMarkId==cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 2)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 15000000 && a.Price <= 20000000 && a.TradeMarkId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 3)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 20000000 && a.Price <= 25000000 && a.TradeMarkId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 4)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 25000000 && a.Price <= 30000000 && a.TradeMarkId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 5)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price > 30000000 && a.TradeMarkId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+
+            return BadRequest();
+        }
+        [HttpGet]
+
+        public async Task<IActionResult> FilterPrice(int id, int cate)
+        {
+
+            if (id == 1)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price < 15000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 2)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 15000000 && a.Price <= 20000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 3)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 20000000 && a.Price <= 25000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 4)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price >= 25000000 && a.Price <= 30000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
+            }
+            if (id == 5)
+            {
+                var result = (from a in _context.Product
+                              join b in _context.TradeMarks on a.TradeMarkId equals b.Id
+                              where a.Price > 30000000 && a.CategoryId == cate
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Category = a.Category.Name,
+                                  Price = a.Price,
+                                  SalePrice = a.SalePrice,
+                                  Description = a.Description,
+                                  Stock = a.Stock,
+                                  TradeMark = b.Name,
+                                  Star = a.Star,
+                                  Image = a.Image,
+                                  HardDisk = a.HardDisk,
+                                  Port = a.Port,
+                                  Os = a.OS,
+                                  ReleaseTime = a.ReleaseTime,
+                              }).ToArray();
+
+                return Ok(new
+                {
+                    pro = result,
+                    count = result.Count()
+                });
             }
 
             return BadRequest();

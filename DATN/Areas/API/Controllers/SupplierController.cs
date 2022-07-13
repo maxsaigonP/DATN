@@ -2,6 +2,7 @@
 using DATN.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 
 namespace DATN.Areas.API.Controllers
@@ -41,10 +42,38 @@ namespace DATN.Areas.API.Controllers
             });
         }
 
+
+        [HttpGet]
+
+        public async Task<IActionResult> GetSupplier(int id)
+        {
+            var sup = (from a in _context.Supplier
+                       where a.Id== id
+                       select new
+                       {
+                           Id = a.Id,
+                           Name = a.SupplierName,
+                           Email = a.Email,
+                           Phone = a.Phone,
+                           Address = a.Address
+                       }).FirstOrDefault();
+
+            return Ok(sup);
+        }
+
         [HttpPost]
 
         public async Task<IActionResult> PostSupplier(Supplier sup)
         {
+            var ncc = await _context.Supplier.Where(s => s.SupplierName.ToLower().Contains(sup.SupplierName.ToLower())||s.Email.ToLower().Contains(sup.Email.ToLower())).ToListAsync();
+            if (ncc.Count > 0)
+            {
+                return Ok(new
+                {
+                    status = 500,
+                    msg = "Nhà sản xuất hoặc email đã tồn tại."
+                });
+            }
             if(ModelState.IsValid)
             {
                 sup.Image = "";
@@ -64,12 +93,21 @@ namespace DATN.Areas.API.Controllers
 
         [HttpPost]
 
-        public async Task<IActionResult> EditSupplier(Supplier sup)
+        public async Task<IActionResult> EditSupplier(int id,Supplier sup)
         {
             if (ModelState.IsValid)
             {
-                var check = await _context.Supplier.FindAsync(sup.Id);
-                if(check!=null)
+                var check = await _context.Supplier.FindAsync(id);
+                var ncc = await _context.Supplier.Where(s => s.SupplierName.ToLower().Contains(sup.SupplierName.ToLower()) || s.Email.ToLower().Contains(sup.Email.ToLower())&&!check.SupplierName.Contains(sup.SupplierName)).ToListAsync();
+                if (ncc.Count > 0)
+                {
+                    return Ok(new
+                    {
+                        status = 500,
+                        msg = "Nhà sản xuất hoặc email đã tồn tại."
+                    });
+                }
+                if (check!=null)
                 {
                     check.SupplierName = sup.SupplierName;
                     check.Email = sup.Email;

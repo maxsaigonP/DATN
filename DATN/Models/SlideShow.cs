@@ -17,6 +17,7 @@ namespace DATN.Models
         [Required(ErrorMessage = "Không được bỏ trống")]
         public string? Image { get; set; }
 
+        public bool? Active { get; set; }
 
        
     }

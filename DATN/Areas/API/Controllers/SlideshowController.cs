@@ -13,7 +13,7 @@ namespace DATN.Areas.API.Controllers
 
             private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public string Url = "C:\\Users\\BAO PHUC- PC\\DATN\\src\\assets\\img\\slide";
+        public string Url = "D:\\Do An Tot Ngiep\\DATN\\src\\assets\\img\\slide";
 
         public SlideshowController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -31,9 +31,42 @@ namespace DATN.Areas.API.Controllers
                          {
                              Id=a.Id,
                              Link=a.Link,
-                             Image=a.Image
+                             Image=a.Image,
+                             Active=a.Active,
                          }).ToList();  
             
+            return Ok(result);
+        }
+
+        [HttpGet]
+
+        public async Task<IActionResult> GetSlideshowActive()
+        {
+            var result = (from a in _context.SlideShow
+                          where a.Active== true
+                          select new
+                          {
+                              Id = a.Id,
+                              Link = a.Link,
+                              Image = a.Image,
+                              Active = a.Active,
+                          }).ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSlideshowDetail(int id)
+        {
+            var result = (from a in _context.SlideShow
+                          where a.Id==id
+                          select new
+                          {
+                              Id = a.Id,
+                              Link = a.Link,
+                              Image = a.Image
+                          }).FirstOrDefault();
+
             return Ok(result);
         }
 
@@ -57,6 +90,30 @@ namespace DATN.Areas.API.Controllers
             return BadRequest();
 
            
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditSlideshow(int id,SlideShow slide)
+        {
+
+            var sl = await _context.SlideShow.FindAsync(id);
+            if (ModelState.IsValid)
+            {
+                if(sl!=null)
+                {
+                    sl.Link = slide.Link;
+                    _context.Update(sl);
+                  await  _context.SaveChangesAsync();
+                }
+                return Ok(
+                    new
+                    {
+                        status = 200,
+                    });
+            }
+            return BadRequest();
+
+
         }
 
         [HttpPost, DisableRequestSizeLimit]
@@ -105,7 +162,7 @@ namespace DATN.Areas.API.Controllers
         }
 
         [HttpPost, DisableRequestSizeLimit]
-        public async Task<IActionResult> UpdateImage()
+        public async Task<IActionResult> UpdateImage(int id)
         {
 
 
@@ -119,24 +176,30 @@ namespace DATN.Areas.API.Controllers
                     var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
 
 
-                    var id = int.Parse(fileName.Split('.')[0]);
+                    var fname = id.ToString() + "." + fileName.Split('.')[1];
                     var pro = await _context.SlideShow.FindAsync(id);
 
 
                     //
 
-                    string FileName = pro.Image;
-                    string Path1 = Url + FileName;
-                    FileInfo file1 = new FileInfo(Path1);
-                    if (file1.Exists)
+
+                    string Path1 = Url + pro.Image;
+                    if (pro.Image != null && pro.Image != "")
                     {
-                        file1.Delete();
+                        FileInfo file1 = new FileInfo(Path1);
+                        if (file1.Exists)
+                        {
+                            file1.Delete();
+                        }
                     }
-                    var path = Path.Combine(Url, fileName);
+                    var path = Path.Combine(Url, fname);
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         file.CopyTo(stream);
                     }
+                    pro.Image = fname;
+                    _context.Update(pro);
+                    await _context.SaveChangesAsync();
                     return Ok();
                 }
                 else
@@ -167,6 +230,36 @@ namespace DATN.Areas.API.Controllers
             {
                 status = 200
             });
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> Active(int id)
+        {
+            var product = await _context.SlideShow.FindAsync(id);
+            if (product.Image != null)
+            {
+               if(product.Active!=true)
+                {
+                    product.Active = true;
+                }else
+                {
+                    product.Active = false;
+                }
+               _context.Update(product);
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    Status = 200
+                });
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
     }
 }

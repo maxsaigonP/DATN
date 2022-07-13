@@ -33,6 +33,7 @@ namespace DATN.Areas.API.Controllers
                               TenSanPham = b.Name,
                               IdSanPham = a.ProductId,
                               SoLuong = a.Quantity,
+                              GiaGiam=b.SalePrice,
                               GiaSanPham=b.Price,
                               Gia =(b.SalePrice==0?b.Price:b.SalePrice) * a.Quantity,
                               SoLuongCart= (from c in _context.Cart

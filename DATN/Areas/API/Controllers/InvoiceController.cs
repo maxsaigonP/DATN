@@ -575,7 +575,7 @@ namespace DATN.Areas.API.Controllers
             var sale = _context.Invoice.Where(i => i.IssuedDate.Value.Day >= DateTime.Now.Day - 7 && i.IssuedDate.Value.Day <= DateTime.Now.Day && i.IssuedDate.Value.Month  >= DateTime.Now.Month  && i.IssuedDate.Value.Month <= DateTime.Now.Month && i.Complete == true).Sum(i => i.Total);
 
             var imp = _context.importedInvoice.Where(i => i.DateImport.Day >= DateTime.Now.Day - 7 && i.DateImport.Day <= DateTime.Now.Day && i.DateImport.Month  >= DateTime.Now.Month && i.DateImport.Month <= DateTime.Now.Month).Sum(i => i.Total);
-
+            var ban = result1.Sum(a => a.GiaBan * a.SoLuongBan);
             return Ok(new
             {
                 lst = result1,
@@ -583,6 +583,7 @@ namespace DATN.Areas.API.Controllers
                 ban = slb,
                 totaln = imp,
                 totalb = sale,
+                totalban = ban
             });
 
 
@@ -592,43 +593,38 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<ActionResult> ThongKeTheoThang(int month)
         {
-            var inv = (from a in _context.Invoice
-                       join b in _context.AppUsers on a.AppUserId equals b.Id
-                       where a.IssuedDate.Value.Month ==month && a.Status == true && a.Complete == true
-                       select new
-                       {
-                           Id = a.Id,
-                           Username = b.UserName,
-                           ShippingAddress = a.ShippingAddress,
-                           Phone = a.ShippingPhone,
-                           Date = a.IssuedDate,
-                           Total = a.Total,
-                           Status = a.Status,
-                           Complete = a.Complete,
-                       }).ToArray();
+            var result = (from a in _context.Product
+                          select new
+                          {
+                              SanPham = a.Name,
+                              GiaNhap = a.ImportPrice,
+                              GiaBan = a.Price,
+                              SoLuongBan = (from b in _context.invoiceDetail
+                                            join d in _context.Invoice on b.InvoiceId equals d.Id
+                                            where b.ProductId == a.Id &&  d.IssuedDate.Value.Month >= month && d.IssuedDate.Value.Month <= month && d.IssuedDate.Value.Year >= DateTime.Now.Year && d.IssuedDate.Value.Year <= DateTime.Now.Year && d.Complete == true
+                                            select b.Quantity).Sum(),
 
-            var slNhap = (from a in _context.ImportecInvoiceDetail
-                          join b in _context.importedInvoice on a.ImportedInvoiceId equals b.Id
-                          where b.DateImport.Month ==month&& b.DateImport.Year==DateTime.Now.Year
-                          select a.Quantity).Sum();
-            var slBan = (from a in _context.invoiceDetail
-                         join b in _context.Invoice on a.InvoiceId equals b.Id
-                         where b.IssuedDate.Value.Month==month && b.IssuedDate.Value.Year==DateTime.Now.Year
-                         select a.Quantity).Sum();
-            var result = _context.Invoice.Where(i => i.IssuedDate.Value.Month==month &&i.IssuedDate.Value.Year==DateTime.Now.Year&& i.Complete == true).Sum(i => i.Total);
+                              SoLuongNhap = (from c in _context.ImportecInvoiceDetail
+                                             join e in _context.importedInvoice on c.ImportedInvoiceId equals e.Id
+                                             where c.ProductId == a.Id &&  e.DateImport.Month >= month && e.DateImport.Month <= month && e.DateImport.Year >= DateTime.Now.Year && e.DateImport.Year <= DateTime.Now.Year
+                                             select c.Quantity).Sum()
+                          }
+                                  ).ToArray();
+            var result1 = result.Where(a => a.SoLuongNhap != 0 || a.SoLuongBan != 0).ToList();
+            var sln = result1.Sum(a => a.SoLuongNhap);
+            var slb = result1.Sum(a => a.SoLuongBan);
+            var sale = _context.Invoice.Where(i => i.IssuedDate.Value.Month >= month && i.IssuedDate.Value.Month <= month && i.Complete == true).Sum(i => i.Total);
 
-            var imp = _context.importedInvoice.Where(i => i.DateImport.Month==month&&i.DateImport.Year==DateTime.Now.Year).Sum(i => i.Total);
-
-
-
+            var imp = _context.importedInvoice.Where(i =>  i.DateImport.Month >= month && i.DateImport.Month <= month).Sum(i => i.Total);
+            var ban = result1.Sum(a => a.GiaBan * a.SoLuongBan);
             return Ok(new
             {
-                inv = inv,
-                importTotal = imp,
-                saleTotal = result,
-                importQuantily = slNhap,
-                saleQuantily = slBan
-
+                lst = result1,
+                nhap = sln,
+                ban = slb,
+                totaln = imp,
+                totalb = sale,
+                totalban = ban
             });
 
 
