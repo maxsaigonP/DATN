@@ -133,18 +133,24 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<IActionResult> GetDash()
         {
-            var pMotnhI = await _context.importedInvoice.Where(i => i.DateImport.Month == DateTime.Now.Month - 1).ToListAsync();
-            var pMotnh = await _context.Invoice.Where(i => i.IssuedDate.Value.Month == DateTime.Now.Month-1&&i.Complete==true).ToListAsync();
-            var cMotnhI = await _context.importedInvoice.Where(i => i.DateImport.Month == DateTime.Now.Month).ToListAsync();
-            var cMotnh = await _context.Invoice.Where(i => i.IssuedDate.Value.Month == DateTime.Now.Month&&i.Complete==true).ToListAsync();
-            var p = pMotnh.Sum(i => i.Total);
-            var c = cMotnh.Sum(i => i.Total);
-            var pI=pMotnhI.Sum(i => i.Total);
-            var cI=cMotnhI.Sum(i => i.Total);
+           
+            var cNhap = await _context.importedInvoice.ToListAsync();
+            var cBan = await _context.Invoice.Where(i =>i.Complete==true).ToListAsync();
+            var p = cNhap.Sum(i=>i.Total);
+            var c = cBan.Sum(i => i.Total);
+
+            var hdh = await _context.Invoice.Where(i => i.Cancel == true).ToListAsync();
+            var sospnhap=await _context.ImportecInvoiceDetail.ToListAsync();
+            var sospban = await _context.invoiceDetail.ToListAsync();
+            var hdht = await _context.Invoice.Where(i => i.Complete == true).ToListAsync();
             return Ok(new
             {
-                pMonth = p-pI,
-                cMonth=c-cI
+                mNhap =p,
+                mBan = c,
+                hdHuy = hdh.Count(),
+                soNhap=sospnhap.Sum(i=>i.Quantity),
+                soBan=sospban.Sum(i=>i.Quantity),
+                hdHt=hdht.Count()
             });
         }
 

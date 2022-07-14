@@ -395,7 +395,8 @@ namespace DATN.Controllers
                         password += allCharacters.ToCharArray()[(int)Math.Floor(rand * allCharacters.Length)];
                     }
                 }
-                string token = password;
+                string content = "Đây là mã xác thực tài khoản 2P Shop của bạn ! <br>";
+                string token =content+"<h1>" +password+"</h1>";
                 string _from = "0306191060@caothang.edu.vn";
                 string _subject = "Xác thực tài khoản 2PShop";
                 string _body = token;
@@ -423,7 +424,7 @@ namespace DATN.Controllers
                     {
                         status = 200,
                         msg = "Mã xác thực đã gửi đến mail ",
-                        otp=token
+                        otp=password
                     });
                 }
                 catch (Exception e)
