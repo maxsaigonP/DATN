@@ -63,7 +63,7 @@ namespace DATN.Areas.API.Controllers
         public async Task<IActionResult> PostTradeMark(string name)
         {
             var check = await _context.TradeMarks.Where(t => t.Name.ToLower().Contains(name.ToLower())).ToListAsync();
-            if(check.Count>0)
+            if (check.Count > 0)
             {
                 return Ok(new
                 {
@@ -71,7 +71,7 @@ namespace DATN.Areas.API.Controllers
                     msg = "Tên nhãn hiệu đã tồn tại"
                 });
             }
-            var tradeMark=new TradeMark();
+            var tradeMark = new TradeMark();
             tradeMark.Name = name;
             _context.TradeMarks.Add(tradeMark);
             try
@@ -79,18 +79,16 @@ namespace DATN.Areas.API.Controllers
                 await _context.SaveChangesAsync();
                 return Ok(new
                 {
-                    status=200,
-                    msg="Thêm thành công",
-                    id=tradeMark.Id
+                    status = 200,
+                    msg = "Thêm thành công",
+                    id = tradeMark.Id
                 });
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
             return BadRequest();
-            
-
-           ;    
         }
 
 
@@ -195,6 +193,14 @@ namespace DATN.Areas.API.Controllers
             if(check==null)
             {
                 return BadRequest();
+            }
+            var lst=await _context.Product.Where(t=>t.TradeMarkId==id).ToListAsync();
+            if(lst.Count>0)
+            {
+                return Ok(new
+                {
+                    status = 500
+                });
             }
             if (check.Image != null)
             {

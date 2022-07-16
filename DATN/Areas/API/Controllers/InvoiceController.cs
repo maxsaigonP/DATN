@@ -27,6 +27,7 @@ namespace DATN.Areas.API.Controllers
         {
             var result = (from a in _context.Invoice
                           join b in _context.AppUsers on a.AppUserId equals b.Id
+                          orderby a.Id descending
                           select new
                           {
                               Id = a.Id,
@@ -37,6 +38,7 @@ namespace DATN.Areas.API.Controllers
                               Total = a.Total,
                               Status = a.Status,
                               Complete = a.Complete,
+                              Code=a.Code,
                               Note=a.Note,
                               Cancel=a.Cancel
                           }).ToArray();
@@ -63,6 +65,7 @@ namespace DATN.Areas.API.Controllers
                                    ShippingAddress = a.ShippingAddress,
                                    Phone = a.ShippingPhone,
                                    Date = a.IssuedDate,
+                                   Code = a.Code,
                                    Total = a.Total,
                                    Status = a.Status,
                                    Complete = a.Complete,
@@ -87,6 +90,7 @@ namespace DATN.Areas.API.Controllers
                                   ShippingAddress = a.ShippingAddress,
                                   Phone = a.ShippingPhone,
                                   Date = a.IssuedDate,
+                                  Code = a.Code,
                                   Total = a.Total,
                                   Status = a.Status,
                                   Complete = a.Complete,
@@ -109,6 +113,7 @@ namespace DATN.Areas.API.Controllers
                               ShippingAddress = a.ShippingAddress,
                               Phone = a.ShippingPhone,
                               Date = a.IssuedDate,
+                              Code = a.Code,
                               Total = a.Total,
                               Status = a.Status,
                               Complete = a.Complete,
@@ -135,6 +140,7 @@ namespace DATN.Areas.API.Controllers
                               ShippingAddress = a.ShippingAddress,
                               Phone = a.ShippingPhone,
                               Date = a.IssuedDate,
+                              Code = a.Code,
                               Total = a.Total,
                               Status = a.Status,
                               Complete = a.Complete
@@ -160,6 +166,7 @@ namespace DATN.Areas.API.Controllers
                                ShippingAddress = a.ShippingAddress,
                                Phone = a.ShippingPhone,
                                Date = a.IssuedDate,
+                               Code = a.Code,
                                Total = a.Total,
                                Status = a.Status,
                                Complete = a.Complete,
@@ -188,6 +195,7 @@ namespace DATN.Areas.API.Controllers
                               Username = b.UserName,
                               ShippingAddress = a.ShippingAddress,
                               Phone = a.ShippingPhone,
+                              Code = a.Code,
                               Date = a.IssuedDate,
                               Total = a.Total
                           }).ToArray();
@@ -205,17 +213,47 @@ namespace DATN.Areas.API.Controllers
                           {
                               Id = a.Id,
                               Username = b.UserName,
+                              Name=b.FullName,
                               ShippingAddress = a.ShippingAddress,
                               Phone = a.ShippingPhone,
                               Date = a.IssuedDate,
                               Total = a.Total,
-                              Note=a.Note,
+                              Code = a.Code,
+                              Note =a.Note,
                               Cancel=a.Cancel,
                               Status=a.Status,
                               Complete=a.Complete
                           }).FirstOrDefault();
 
             return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Search(string txt)
+        {
+            var result = (from a in _context.Invoice
+                          join b in _context.AppUsers on a.AppUserId equals b.Id
+                          where a.ShippingPhone.ToLower().Contains(txt.ToLower()) || a.AppUser.UserName.ToLower().Contains(txt.ToLower()) || a.Code.ToUpper() == txt.ToUpper()
+                          select new
+                          {
+                              Id = a.Id,
+                              Username = b.UserName,
+                              ShippingAddress = a.ShippingAddress,
+                              Phone = a.ShippingPhone,
+                              Date = a.IssuedDate,
+                              Total = a.Total,
+                              Code = a.Code,
+                              Note = a.Note,
+                              Cancel = a.Cancel,
+                              Status = a.Status,
+                              Complete = a.Complete
+                          }).ToArray();
+
+            return Ok(new
+            {
+                inv = result
+
+            });
         }
 
         [HttpGet]
@@ -229,6 +267,7 @@ namespace DATN.Areas.API.Controllers
                               SanPham = b.Name,
                               Soluong = a.Quantity,
                               DonGia = a.UnitPrice,
+                              
 
                           }).ToList();
 
@@ -257,6 +296,7 @@ namespace DATN.Areas.API.Controllers
                     inv.Complete = true;
                     inv.Cancel = false;
                 }
+                inv.IssuedDate = DateTime.Now;
                 _context.Update(inv);
                 await _context.SaveChangesAsync();
                 return Ok(new
@@ -305,7 +345,24 @@ namespace DATN.Areas.API.Controllers
 
         public async Task<IActionResult> Create(string id, string Address, string? Phone,string? Note)
         {
-
+            string UpperCase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+            string LowerCase = "qwertyuiopasdfghjklzxcvbnm";
+            string Digits = "1234567890";
+            string allCharacters = UpperCase + Digits;
+            Random r = new Random();
+            String code = "";
+            for (int i = 0; i < 4; i++)
+            {
+                double rand = r.NextDouble();
+                if (i == 0)
+                {
+                    code += UpperCase.ToCharArray()[(int)Math.Floor(rand * UpperCase.Length)];
+                }
+                else
+                {
+                    code += allCharacters.ToCharArray()[(int)Math.Floor(rand * allCharacters.Length)];
+                }
+            }
 
             var cart = _context.Cart.Where(c => c.AppUserId == id && c.Status == false).ToList();
             var total = 0;
@@ -360,6 +417,9 @@ namespace DATN.Areas.API.Controllers
                 try
                 {
                    
+                    await _context.SaveChangesAsync();
+                    iv.Code="HD"+code+iv.Id.ToString();
+                    _context.Update(iv);
                     await _context.SaveChangesAsync();
                 }
                 catch (Exception ex)

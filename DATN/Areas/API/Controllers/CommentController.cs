@@ -100,7 +100,6 @@ namespace DATN.Areas.API.Controllers
                               DanhGia = a.Star,
                               ThoiGian = a.Time,
                               TenNguoiDung=c.FullName,
-                    
                               RepId=a.ReplyId
                           }).ToList();
             return Ok(result);
