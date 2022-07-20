@@ -98,6 +98,7 @@ namespace DATN.Areas.API.Controllers
                          join d in _context.Category on a.CategoryId equals d.Id
                          let sum = (from b in _context.invoiceDetail
                                     join hd in _context.Invoice on b.InvoiceId equals hd.Id
+                                    where hd.IssuedDate<=DateTime.Now && hd.IssuedDate.Value.Month>=DateTime.Now.Month-1
                                     where b.ProductId == a.Id
                                     select b.Quantity
                                        ).Sum()
@@ -449,7 +450,11 @@ namespace DATN.Areas.API.Controllers
          
             if (pro.Count != 0)
             {
-                return BadRequest("Sản phẩm đã tồn tại");
+                return Ok(new
+                {
+                    Status=500,
+                    msg="Sản phẩm đã tồn tại"
+                });
             }
             if (ModelState.IsValid)
             {

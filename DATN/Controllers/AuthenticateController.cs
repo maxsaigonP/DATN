@@ -500,7 +500,7 @@ namespace DATN.Controllers
         {
 
             var email = await _context.AppUsers.Where(t => t.Email == mail).ToListAsync();
-            if (email.Count > 0)
+            if (email.Count == 0)
             {
                 string UpperCase = "QWERTYUIOPASDFGHJKLZXCVBNM";
                 string LowerCase = "qwertyuiopasdfghjklzxcvbnm";

@@ -33,6 +33,7 @@ namespace DATN.Models
 
         public bool? Cancel { get; set; }
         public bool? Status { get; set; }
+        public bool? Ship { get; set; }
 
         [DisplayName("Hoàn thành")]
         public bool? Complete { get; set; }
